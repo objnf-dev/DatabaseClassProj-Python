@@ -14,7 +14,7 @@ app.register_blueprint(routes)
 def readConf():
     try:
         f = open("config.yaml", "r")
-        fileData = yaml.load(f)
+        fileData = yaml.safe_load(f)
         f.close()
     except Exception:
         print("Failed to read configuration.")
