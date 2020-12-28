@@ -3,5 +3,7 @@ Web:
 
 Database: 
   username: "root"
-  address: "localhost:3306"
+  password: ""
+  host: "localhost"
+  port: "3306"
   dbname: "ticket_sys"
