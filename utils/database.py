@@ -2,7 +2,7 @@ import mysql.connector
 import sys
 from . import errno
 
-def connectDB(username, password, host, port, dbname):
+def connectDB(username: str, password: str, host: str, port: int, dbname: str):
     try:
         dbConn = mysql.connector.connect(user = username, password = password, host = host, port = port, dbname = dbname)
     except Exception:

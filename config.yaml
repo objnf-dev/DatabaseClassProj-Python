@@ -5,5 +5,5 @@ Database:
   username: "root"
   password: "test1234"
   host: "localhost"
-  port: "3306"
+  port: 3306
   dbname: "ticket_sys"
