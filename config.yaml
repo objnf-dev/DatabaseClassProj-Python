@@ -1,0 +1,7 @@
+Web:
+  port: 9999
+
+Database: 
+  username: "root"
+  address: "localhost:3306"
+  dbname: "ticket_sys"
