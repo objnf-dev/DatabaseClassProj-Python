@@ -47,3 +47,20 @@ def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat
         return False
 
 
+def queryUser():
+    pass
+
+
+def queryTrainByName():
+    pass
+
+
+def queryTrainByStation():
+    pass
+
+
+def queryTrainByTime():
+    pass
+
+
+

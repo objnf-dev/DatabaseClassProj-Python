@@ -8,7 +8,7 @@ from routes import *
 
 
 app = Flask(__name__)
-app.secret_key = b'Fzr2lfT#I^x%2NgD80S!fK&oxvf@rU3R'
+app.secret_key = os.urandom(32)
 
 app.register_blueprint(routes)
 
