@@ -35,10 +35,9 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         cursor.execute("USE ticket_sys;")
         cursor.execute("""
             CREATE TABLE `user`(
-                `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                `gid` INT,
-                `username` CHAR(20) NOT NULL,
+                `username` CHAR(20) NOT NULL PRIMARY KEY,
                 `password` CHAR(32) NOT NULL,
+                `gid` INT,
                 `is_admin` TINYINT(1) NOT NULL
             );
         """)
@@ -65,8 +64,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         cursor.execute("""
             CREATE TABLE `order`(
                 `oid` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                `uid` INT NOT NULL,
-                FOREIGN KEY (`uid`) REFERENCES user(`id`),
+                `username` CHAR(20) NOT NULL,
+                FOREIGN KEY (`username`) REFERENCES user(`username`),
                 `gid` INT,
                 `status` TINYINT(1) NOT NULL
             );
@@ -82,8 +81,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         Conn.commit()
         for i in admin:
             cursor.execute("""
-                INSERT INTO user(`gid`, `username`, `password`, `is_admin`) VALUES
-                (NULL, %s, MD5(%s), 1);
+                INSERT INTO user(`username`, `password`, `gid`, `is_admin`) VALUES
+                (%s, MD5(%s), NULL, 1);
             """, (i, admin[i]))
         Conn.commit()
     except Exception as e:

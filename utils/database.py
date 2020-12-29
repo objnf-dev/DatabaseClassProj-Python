@@ -17,8 +17,8 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
     cursor = Conn.cursor(buffered = True) 
     try: 
         cursor.execute("""
-            INSERT INTO user(`gid`, `username`, `password`, `is_admin`) VALUES
-            (NULL, %s, MD5(%s), 0);
+            INSERT INTO user(`username`, `password`, `gid`, `is_admin`) VALUES
+            (%s, MD5(%s), NULL, 0);
         """, (username, password))
         Conn.commit()
         Conn.close()
@@ -45,6 +45,14 @@ def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat
         print("[-] Add train failed.\n" + str(e))
         Conn.close()
         return False
+
+
+def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: str):
+    cursor = Conn.cursor(buffered = True)
+    try:
+        cursor.execute("""
+            SELECT `password` FROM `user` WHERE `username` = %s;
+        """, (username, ))
 
 
 def queryUser():

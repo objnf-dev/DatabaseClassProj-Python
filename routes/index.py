@@ -1,6 +1,6 @@
 from flask import Flask, session, request, render_template, redirect
 from . import routes
-from utils import database
+from utils.database import checkLogin
 
 
 @routes.route('/')

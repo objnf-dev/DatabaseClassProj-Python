@@ -3,7 +3,8 @@ import yaml
 import sys
 import os
 import errno
-from utils import database, createDB
+from utils import createDB
+from utils.database import connectDB
 from routes import *
 
 
@@ -34,7 +35,7 @@ if __name__ == '__main__':
         with open("install.lock", "w"):
             pass
 
-    dbConn = database.connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
+    dbConn = connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
         config["Database"]["port"], "ticket_sys")
     try:
         app.run(port = config['Web']['port'])

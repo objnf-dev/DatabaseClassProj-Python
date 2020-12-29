@@ -3,10 +3,9 @@ CREATE DATABASE ticket_sys;
 USE ticket_sys;
 
 CREATE TABLE `user`(
-    `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `gid` INT,
-    `username` CHAR(20) NOT NULL,
+    `username` CHAR(20) NOT NULL PRIMARY KEY,
     `password` CHAR(32) NOT NULL,
+    `gid` INT,
     `is_admin` TINYINT(1) NOT NULL
 );
 
@@ -30,8 +29,8 @@ END;
 
 CREATE TABLE `order`(
     `oid` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `uid` INT NOT NULL,
-    FOREIGN KEY (`uid`) REFERENCES user(`id`),
+    `username` CHAR(20) NOT NULL,
+    FOREIGN KEY (`username`) REFERENCES user(`username`),
     `gid` INT,
     `status` TINYINT(1) NOT NULL
 );
@@ -44,4 +43,4 @@ BEGIN
 END;
 
 
-INSERT INTO user(`id`, `gid`, `username`, `password`, `is_admin`) VALUES (1, NULL, "superuser", ***, 1)
+INSERT INTO user(`username`, `password`,`gid`, `is_admin`) VALUES ("superuser", "test1234", NULL, 1)
