@@ -4,7 +4,7 @@ from . import errno
 
 def noDBConn(username: str, password: str, host: str, port: int):
     try:
-        tempDBConn = mysql.connector.connect(username=username, password=password, host=host, port=port)
+        tempDBConn = mysql.connector.connect(user = username, password = password, host = host, port = port)
     except Exception as e:
         print("Unable to connect to database.\n" + str(e))
         sys.exit(errno.DB_CONN_ERROR)
@@ -81,3 +81,6 @@ def createTable(Conn: mysql.connector.MySQLConnection, dbName: str):
     except Exception as e:
         print("Create tables error.\n" + str(e))
         sys.exit(errno.TABLE_CREATE_FAILED)
+    finally:
+        cursor.close()
+        Conn.close()
