@@ -1,6 +1,7 @@
 import mysql.connector
 import sys
 from datetime import datetime
+from hashlib import md5
 from . import errno
 
 
@@ -21,11 +22,11 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
             (%s, MD5(%s), NULL, 0);
         """, (username, password))
         Conn.commit()
-        Conn.close()
+        cursor.close()
         return True
     except Exception as e:
         print("[-] Add user failed." + str(e))
-        Conn.close()
+        cursor.close()
         return False
 
 
@@ -39,11 +40,11 @@ def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat
             (%s, %s, %s, %s, %s, %s, %s);
         """, (trainName, startStat, startTime, endStat, endTime, capacity, price))
         Conn.commit()
-        Conn.close()
+        cursor.close()
         return True
     except Exception as e:
         print("[-] Add train failed.\n" + str(e))
-        Conn.close()
+        cursor.close()
         return False
 
 
@@ -53,6 +54,15 @@ def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: s
         cursor.execute("""
             SELECT `password` FROM `user` WHERE `username` = %s;
         """, (username, ))
+        Conn.commit()
+        if md5(password.encode("ascii")).hexdigest() == cursor["password"]:
+            print("[+] User {} login successfully.\n".format(username))
+            return True
+        else:
+            return False
+    except Exception as e:
+        print("[-] Login error.\n" + str(e))
+        return False
 
 
 def queryUser():

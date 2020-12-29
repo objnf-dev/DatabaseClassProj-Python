@@ -10,8 +10,7 @@ CREATE TABLE `user`(
 );
 
 CREATE TABLE `train`(
-    `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `train_name` CHAR(10) NOT NULL,
+    `train_name` CHAR(10) NOT NULL PRIMARY KEY,
     `start_station` CHAR(10) NOT NULL,
     `start_time` DATETIME NOT NULL,
     `stop_station` CHAR(10) NOT NULL,
@@ -31,6 +30,8 @@ CREATE TABLE `order`(
     `oid` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `username` CHAR(20) NOT NULL,
     FOREIGN KEY (`username`) REFERENCES user(`username`),
+    `train` CHAR(10) NOT NULL,
+    FOREIGN KEY (`train`) REFERENCES train(`train_name`),
     `gid` INT,
     `status` TINYINT(1) NOT NULL
 );

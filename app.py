@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 import yaml
 import sys
 import os
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         with open("install.lock", "w"):
             pass
 
-    dbConn = connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
+    g.dbConn = connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
         config["Database"]["port"], "ticket_sys")
     try:
         app.run(port = config['Web']['port'])
