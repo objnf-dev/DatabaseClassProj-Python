@@ -1,8 +1,9 @@
 from flask import Flask
 import yaml
 import sys
+import os
 import errno
-from utils import database
+from utils import database, createDB
 from routes import *
 
 
@@ -24,10 +25,18 @@ def readConf():
 
 if __name__ == '__main__':
     config = readConf()
+    if not os.path.isfile("install.lock"):
+        dbConn = createDB.noDBConn(config["Database"]["username"], config["Database"]["password"], 
+            config["Database"]["host"], config["Database"]["port"])
+        createDB.createDB(dbConn, config["Database"]["dbname"])
+        createDB.createTable(dbConn, config["Database"]["dbname"])
+        with open("install.lock", "w"):
+            pass
+
     dbConn = database.connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
         config["Database"]["port"], config["Database"]["dbname"])
     try:
         app.run(port = config['Web']['port'])
-    except Exception:
-        print("Failed to start web server.")
+    except Exception as e:
+        print("Failed to start web server.\n" + str(e))
         sys.exit(errno.APP_START_ERROR)
