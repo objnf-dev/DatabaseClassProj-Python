@@ -28,13 +28,13 @@ if __name__ == '__main__':
     if not os.path.isfile("install.lock"):
         dbConn = createDB.noDBConn(config["Database"]["username"], config["Database"]["password"], 
             config["Database"]["host"], config["Database"]["port"])
-        createDB.createDB(dbConn, config["Database"]["dbname"])
-        createDB.createTable(dbConn, config["Database"]["dbname"])
+        createDB.createDB(dbConn)
+        createDB.createTable(dbConn, config["Admin"])
         with open("install.lock", "w"):
             pass
 
     dbConn = database.connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"], 
-        config["Database"]["port"], config["Database"]["dbname"])
+        config["Database"]["port"], "ticket_sys")
     try:
         app.run(port = config['Web']['port'])
     except Exception as e:

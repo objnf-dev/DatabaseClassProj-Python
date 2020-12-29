@@ -1,5 +1,6 @@
 import mysql.connector
 import sys
+from hashlib import md5
 from . import errno
 
 def noDBConn(username: str, password: str, host: str, port: int):
@@ -11,33 +12,33 @@ def noDBConn(username: str, password: str, host: str, port: int):
     return tempDBConn
 
 
-def createDB(Conn: mysql.connector.MySQLConnection, dbName: str):
+def createDB(Conn: mysql.connector.MySQLConnection):
     cursor = Conn.cursor()
     cursor.execute("SHOW DATABASES;")
-    if (dbName, ) in cursor:
+    if ("ticket_sys", ) in cursor:
         print("[+] Drop the old database and create a new one.")
         try:
-            cursor.execute("DROP DATABASE %s;" % dbName)
+            cursor.execute("DROP DATABASE ticket_sys;")
         except Exception as e:
             print("Drop database failed.\n" + str(e))
             sys.exit(errno.DB_DROP_FAILED)
     try:
-        cursor.execute("CREATE DATABASE %s;" % dbName)
+        cursor.execute("CREATE DATABASE ticket_sys;")
     except Exception as e:
         print("Create database failed.\n" + str(e))
         sys.exit(errno.DB_CREATE_FAILED)
 
 
-def createTable(Conn: mysql.connector.MySQLConnection, dbName: str):
-    cursor = Conn.cursor()
+def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
+    cursor = Conn.cursor(buffered = True)
     try:
-        cursor.execute("USE %s;" % dbName)
+        cursor.execute("USE ticket_sys;")
         cursor.execute("""
             CREATE TABLE `user`(
                 `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `gid` INT,
                 `username` CHAR(20) NOT NULL,
-                `password` CHAR(60) NOT NULL,
+                `password` CHAR(32) NOT NULL,
                 `is_admin` TINYINT(1) NOT NULL
             );
         """)
@@ -78,6 +79,13 @@ def createTable(Conn: mysql.connector.MySQLConnection, dbName: str):
                 END IF;
             END;
         """)
+        Conn.commit()
+        for i in admin:
+            cursor.execute("""
+                INSERT INTO user(`gid`, `username`, `password`, `is_admin`) VALUES
+                (NULL, %s, MD5(%s), 1);
+            """, (i, admin[i]))
+        Conn.commit()
     except Exception as e:
         print("Create tables error.\n" + str(e))
         sys.exit(errno.TABLE_CREATE_FAILED)

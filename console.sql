@@ -6,7 +6,7 @@ CREATE TABLE `user`(
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `gid` INT,
     `username` CHAR(20) NOT NULL,
-    `password` CHAR(60) NOT NULL,
+    `password` CHAR(32) NOT NULL,
     `is_admin` TINYINT(1) NOT NULL
 );
 
@@ -42,3 +42,6 @@ BEGIN
         SIGNAL SQLSTATE "HY000" SET MESSAGE_TEXT = "Order group info error.";
     END IF;
 END;
+
+
+INSERT INTO user(`id`, `gid`, `username`, `password`, `is_admin`) VALUES (1, NULL, "superuser", ***, 1)
