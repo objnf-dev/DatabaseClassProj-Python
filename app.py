@@ -12,13 +12,14 @@ app.secret_key = b'Fzr2lfT#I^x%2NgD80S!fK&oxvf@rU3R'
 
 app.register_blueprint(routes)
 
+
 def readConf():
     try:
         f = open("config.yaml", "r")
         fileData = yaml.safe_load(f)
         f.close()
     except Exception:
-        print("Failed to read configuration.")
+        print("[-] Failed to read configuration.")
         sys.exit(errno.CONF_READ_ERROR)
     return fileData
 
@@ -38,5 +39,5 @@ if __name__ == '__main__':
     try:
         app.run(port = config['Web']['port'])
     except Exception as e:
-        print("Failed to start web server.\n" + str(e))
+        print("[-] Failed to start web server.\n" + str(e))
         sys.exit(errno.APP_START_ERROR)

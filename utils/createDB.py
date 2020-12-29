@@ -7,7 +7,7 @@ def noDBConn(username: str, password: str, host: str, port: int):
     try:
         tempDBConn = mysql.connector.connect(user = username, password = password, host = host, port = port)
     except Exception as e:
-        print("Unable to connect to database.\n" + str(e))
+        print("[-] Unable to connect to database.\n" + str(e))
         sys.exit(errno.DB_CONN_ERROR)
     return tempDBConn
 
@@ -20,12 +20,12 @@ def createDB(Conn: mysql.connector.MySQLConnection):
         try:
             cursor.execute("DROP DATABASE ticket_sys;")
         except Exception as e:
-            print("Drop database failed.\n" + str(e))
+            print("[-] Drop database failed.\n" + str(e))
             sys.exit(errno.DB_DROP_FAILED)
     try:
         cursor.execute("CREATE DATABASE ticket_sys;")
     except Exception as e:
-        print("Create database failed.\n" + str(e))
+        print("[-] Create database failed.\n" + str(e))
         sys.exit(errno.DB_CREATE_FAILED)
 
 
@@ -87,7 +87,7 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
             """, (i, admin[i]))
         Conn.commit()
     except Exception as e:
-        print("Create tables error.\n" + str(e))
+        print("[-] Create tables error.\n" + str(e))
         sys.exit(errno.TABLE_CREATE_FAILED)
     finally:
         cursor.close()
