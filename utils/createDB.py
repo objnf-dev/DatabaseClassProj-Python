@@ -2,9 +2,10 @@ import mysql.connector
 import sys
 from . import errno
 
+
 def noDBConn(username: str, password: str, host: str, port: int):
     try:
-        tempDBConn = mysql.connector.connect(user = username, password = password, host = host, port = port)
+        tempDBConn = mysql.connector.connect(user=username, password=password, host=host, port=port)
     except Exception as e:
         print("[-] Unable to connect to database.\n" + str(e))
         sys.exit(errno.DB_CONN_ERROR)
@@ -14,7 +15,7 @@ def noDBConn(username: str, password: str, host: str, port: int):
 def createDB(Conn: mysql.connector.MySQLConnection):
     cursor = Conn.cursor()
     cursor.execute("SHOW DATABASES;")
-    if ("ticket_sys", ) in cursor:
+    if ("ticket_sys",) in cursor:
         print("[+] Drop the old database and create a new one.")
         try:
             cursor.execute("DROP DATABASE ticket_sys;")
@@ -29,7 +30,7 @@ def createDB(Conn: mysql.connector.MySQLConnection):
 
 
 def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
-    cursor = Conn.cursor(buffered = True)
+    cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("USE ticket_sys;")
         cursor.execute("""
@@ -54,9 +55,9 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         cursor.execute("""
             CREATE TRIGGER `check_train` BEFORE INSERT ON `train` FOR EACH ROW
             BEGIN 
-		        IF NEW.start_time < SYSDATE() or NEW.stop_time <= NEW.start_time THEN 
-				    SIGNAL SQLSTATE "HY000" SET MESSAGE_TEXT = "Train time error.";
-		        END IF;
+                IF NEW.start_time < SYSDATE() or NEW.stop_time <= NEW.start_time THEN 
+                    SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'Train time error.';
+                END IF;
             END;
         """)
         cursor.execute("""
@@ -73,8 +74,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         cursor.execute("""
             CREATE TRIGGER `check_order` BEFORE INSERT ON `order` FOR EACH ROW
             BEGIN 
-                IF NEW.gid != NULL and NEW.gid NOT IN (SELECT DISTINCT `gid` from `user`) THEN
-                    SIGNAL SQLSTATE "HY000" SET MESSAGE_TEXT = "Order group info error.";
+                IF NEW.gid IS NOT NULL and NEW.gid NOT IN (SELECT DISTINCT `gid` from `user`) THEN
+                    SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'Order group info error.';
                 END IF;
             END;
         """)

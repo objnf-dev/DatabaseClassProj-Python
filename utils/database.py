@@ -7,11 +7,11 @@ from . import errno
 
 def connectDB(username: str, password: str, host: str, port: int, dbname: str):
     try:
-        dbConn = mysql.connector.connect(user = username, password = password, host = host, port = port, database = dbname)
+        newConn = mysql.connector.connect(user = username, password = password, host = host, port = port, database = dbname)
     except Exception as e:
         print("[-] Unable to connect to database.\n" + str(e))
         sys.exit(errno.DB_CONN_ERROR)
-    return dbConn
+    return newConn
 
 
 def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: str):

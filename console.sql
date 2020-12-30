@@ -22,7 +22,7 @@ CREATE TABLE `train`(
 CREATE TRIGGER `check_train` BEFORE INSERT ON `train` FOR EACH ROW
 BEGIN 
 		IF NEW.start_time < SYSDATE() or NEW.stop_time <= NEW.start_time THEN 
-				SIGNAL SQLSTATE "HY000" SET MESSAGE_TEXT = "Train time error.";
+				SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'Train time error.';
 		END IF;
 END;
 
@@ -38,10 +38,10 @@ CREATE TABLE `order`(
 
 CREATE TRIGGER `check_order` BEFORE INSERT ON `order` FOR EACH ROW
 BEGIN 
-    IF NEW.gid != NULL and NEW.gid NOT IN (SELECT DISTINCT `gid` from `user`) THEN
-        SIGNAL SQLSTATE "HY000" SET MESSAGE_TEXT = "Order group info error.";
+    IF NEW.gid IS NOT NULL and NEW.gid NOT IN (SELECT DISTINCT `gid` from `user`) THEN
+        SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'Order group info error.';
     END IF;
 END;
 
 
-INSERT INTO user(`username`, `password`,`gid`, `is_admin`) VALUES ("superuser", "test1234", NULL, 1)
+INSERT INTO user(`username`, `password`,`gid`, `is_admin`) VALUES ('superuser', 'test1234', NULL, 1)
