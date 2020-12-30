@@ -1,39 +1,65 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
- <head> 
-  <meta charset="utf-8" /> 
-  <title>登录・车票管理系统</title> 
-  <!-- Bootstrap core CSS --> 
-  <link href="/static/bootstrap.min.css" rel="stylesheet" /> 
-  <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+<head>
+    <meta charset="utf-8"/>
+    <title>登录・车票管理系统</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
-      }
-    </style> 
-  <!-- Custom styles for this template --> 
-  <link href="/static/signin.css" rel="stylesheet" /> 
- </head> 
- <body class="text-center"> 
-  <main class="form-signin"> 
-   <form action="/login" method="post">
-    <h1> 车票管理系统 </h1> 
-    <h2 class="h3 mb-3 fw-normal">请您登录</h2> 
-    <input type="text" class="form-control" placeholder="用户名" id="inputUsername" required="" autofocus="" /> 
-    <input type="password" id="inputPassword" class="form-control" placeholder="密码" required="" />
-    <button class="w-100 btn btn-lg btn-primary" type="submit">登录</button> 
-    <p class="mt-5 mb-3 text-muted">18271241 周韦彤</p>
-   </form> 
-  </main>   
- </body>
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="/static/signin.css" rel="stylesheet"/>
+</head>
+<body class="text-center">
+<main class="form-signin">
+    <form id="login" action="/login" method="post">
+        <div class="row gy-2">
+            <h1> 车票管理系统 </h1>
+            <h2 class="h3 mb-3 fw-normal">请您登录</h2>
+            <input type="text" id="inputUsername" class="form-control" placeholder="用户名" required autofocus/>
+            <input type="password" id="inputPassword" class="form-control" placeholder="密码" required/>
+            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="submit()">登录</button>
+            <p class="mt-5 mb-3 text-muted">18271241 周韦彤</p>
+        </div>
+    </form>
+</main>
+</body>
+
+<script>
+    let loginForm = document.getElementById("login")
+    loginForm.addEventListener("submit", function () {
+        let username = document.getElementById("inputUsername").value;
+        let password = document.getElementById("inputPassword").value;
+
+        let formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        window.fetch("/login", {
+            method: "POST",
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        }).then(function (res) {
+            console.log(res)
+        });
+
+    });
+</script>
 
 </html>
