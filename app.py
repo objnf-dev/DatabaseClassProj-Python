@@ -2,8 +2,7 @@ from flask import Flask
 import yaml
 import sys
 import os
-from utils import createDB, errno, DBConn
-from utils.database import connectDB
+import utils.database, utils.createDB, utils.errno
 from routes import *
 
 # App settings
@@ -21,31 +20,31 @@ def readConf():
         f.close()
     except Exception:
         print("[-] Failed to read configuration.")
-        sys.exit(errno.CONF_READ_ERROR)
+        sys.exit(utils.errno.CONF_READ_ERROR)
     return fileData
 
 
 # Start here
 if __name__ == '__main__':
-    global DBConn
     config = readConf()
 
     # Check install status
     if not os.path.isfile("install.lock"):
-        dbConn = createDB.noDBConn(config["Database"]["username"], config["Database"]["password"],
+        dbConn = utils.createDB.noDBConn(config["Database"]["username"], config["Database"]["password"],
                                    config["Database"]["host"], config["Database"]["port"])
-        createDB.createDB(dbConn)
-        createDB.createTable(dbConn, config["Admin"])
+        utils.createDB.createDB(dbConn)
+        utils.createDB.createTable(dbConn, config["Admin"])
         with open("install.lock", "w"):
             pass
 
     # Connect to DB
-    DBConn = connectDB(config["Database"]["username"], config["Database"]["password"], config["Database"]["host"],
-                       config["Database"]["port"], "ticket_sys")
+    utils.database.DBConn = utils.database.connectDB(config["Database"]["username"], config["Database"]["password"],
+                                                     config["Database"]["host"],
+                                                     config["Database"]["port"], "ticket_sys")
 
     # Run app
     try:
         app.run(port=config['Web']['port'])
     except Exception as e:
         print("[-] Failed to start web server.\n" + str(e))
-        sys.exit(errno.APP_START_ERROR)
+        sys.exit(utils.errno.APP_START_ERROR)

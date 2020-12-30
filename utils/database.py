@@ -4,6 +4,8 @@ from datetime import datetime
 from hashlib import md5
 from . import errno
 
+DBConn = None
+
 
 def connectDB(username: str, password: str, host: str, port: int, dbname: str):
     try:
@@ -55,11 +57,12 @@ def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: s
             SELECT `password` FROM `user` WHERE `username` = %s;
         """, (username, ))
         Conn.commit()
-        if md5(password.encode("ascii")).hexdigest() == cursor["password"]:
-            print("[+] User {} login successfully.\n".format(username))
-            return True
-        else:
-            return False
+        for sqlpwd in cursor:
+            if (md5(password.encode("ascii")).hexdigest(), ) == sqlpwd:
+                print("[+] User {} login successfully.\n".format(username))
+                return True
+            else:
+                return False
     except Exception as e:
         print("[-] Login error.\n" + str(e))
         return False

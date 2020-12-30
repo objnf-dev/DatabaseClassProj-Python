@@ -8,4 +8,4 @@ Database:
   port: 3306
 
 Admin: 
-  superuser: test1234
+  superuser: "test1234"
