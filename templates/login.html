@@ -25,13 +25,18 @@
 </head>
 <body class="text-center">
 <main class="form-signin">
-    <form id="login" action="/login" method="post">
+    <h1> 车票管理系统 </h1>
+    <h2 class="h3 mb-3 fw-normal">请您登录</h2>
+
+    <div id="successAlert" class="alert alert-success" role="alert" style="display: none;">
+        登录成功！
+    </div>
+
+    <form id="login" action="/">
         <div class="row gy-2">
-            <h1> 车票管理系统 </h1>
-            <h2 class="h3 mb-3 fw-normal">请您登录</h2>
             <input type="text" id="inputUsername" class="form-control" placeholder="用户名" required autofocus/>
             <input type="password" id="inputPassword" class="form-control" placeholder="密码" required/>
-            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="submit()">登录</button>
+            <button type="button" class="w-100 btn btn-lg btn-primary" onclick="login()">登录</button>
             <p class="mt-5 mb-3 text-muted">18271241 周韦彤</p>
         </div>
     </form>
@@ -39,27 +44,28 @@
 </body>
 
 <script>
-    let loginForm = document.getElementById("login")
-    loginForm.addEventListener("submit", function () {
+    function login () {
         let username = document.getElementById("inputUsername").value;
         let password = document.getElementById("inputPassword").value;
 
-        let formData = new FormData();
+        formData = new URLSearchParams();
         formData.append("username", username);
         formData.append("password", password);
 
         window.fetch("/login", {
             method: "POST",
             credentials: 'same-origin',
+            redirect: "follow",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: formData
-        }).then(function (res) {
-            console.log(res)
+        }).then(function () {
+            loginAlert = document.getElementById("successAlert");
+            loginAlert.show();
+            setTimeout(function () {window.location.href = "/"}, 2000);
         });
-
-    });
+    }
 </script>
 
 </html>

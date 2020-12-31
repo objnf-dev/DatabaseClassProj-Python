@@ -15,10 +15,12 @@ def index():
 @routes.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
+        if "user" in session:
+            return "您已经登录。"
         return render_template('login.html')
     elif request.method == 'POST':
         if utils.database.checkLogin(utils.database.DBConn, request.form['username'], request.form['password']):
             session["user"] = request.form['username']
-            return redirect("/")
+            return "ok"
         else:
             abort(401)
