@@ -38,7 +38,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `username` CHAR(20) NOT NULL PRIMARY KEY,
                 `password` CHAR(32) NOT NULL,
                 `gid` INT,
-                `is_admin` TINYINT(1) NOT NULL
+                `is_admin` TINYINT(1) NOT NULL,
+                `balance` FLOAT NOT NULL
             );
         """)
         cursor.execute("""
@@ -82,8 +83,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
         Conn.commit()
         for i in admin:
             cursor.execute("""
-                INSERT INTO user(`username`, `password`, `gid`, `is_admin`) VALUES
-                (%s, MD5(%s), NULL, 1);
+                INSERT INTO user(`username`, `password`, `gid`, `is_admin`, `balance`) VALUES
+                (%s, MD5(%s), NULL, 1, 1000.0);
             """, (i, admin[i]))
         Conn.commit()
     except Exception as e:
