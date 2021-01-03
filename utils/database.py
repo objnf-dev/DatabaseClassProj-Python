@@ -54,15 +54,15 @@ def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: s
     cursor = Conn.cursor(buffered = True)
     try:
         cursor.execute("""
-            SELECT `password` FROM `user` WHERE `username` = %s;
+            SELECT `password`, `is_admin` FROM `user` WHERE `username` = %s;
         """, (username, ))
         Conn.commit()
         for sqlpwd in cursor:
             if md5(password.encode("ascii")).hexdigest() == sqlpwd[0]:
                 print("[+] User {} login successfully.\n".format(username))
-                return True
+                return True, sqlpwd[1]
             else:
-                return False
+                return False, None
     except Exception as e:
         print("[-] Login error.\n" + str(e))
         return False

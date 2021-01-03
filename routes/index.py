@@ -6,26 +6,29 @@ import utils.database
 # Homepage
 @routes.route("/")
 def index():
-    if "user" not in session:
+    if "user" not in session or "is_admin" not in session:
         return redirect("/login")
-    return render_template("index.html", name = session["user"])
+    return render_template("index.html")
 
 
 # Login
 @routes.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        if "user" in session:
+        if "user" in session and "is_admin" in session:
             return "您已经登录。"
         return render_template("login.html")
     elif request.method == "POST":
         if "username" not in request.form or "password" not in request.form:
             abort(400)
-        elif utils.database.checkLogin(utils.database.DBConn, request.form["username"], request.form["password"]):
-            session["user"] = request.form["username"]
-            return "ok"
         else:
-            abort(401)
+            status, is_admin = utils.database.checkLogin(utils.database.DBConn, request.form["username"], request.form["password"])
+            if status == False:
+                abort(401)
+            else:
+                session["user"] = request.form["username"]
+                session["is_admin"] = is_admin
+                return "ok"
 
 
 # Register
@@ -42,6 +45,7 @@ def reg():
             abort(401)
         elif utils.database.createUser(utils.database.DBConn, request.form["username"], request.form["password"]):
             session["user"] = request.form["username"]
+            session["is_admin"] = 0
             return "ok"
         else:
             abort(401)
