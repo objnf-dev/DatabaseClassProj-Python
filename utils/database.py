@@ -68,6 +68,23 @@ def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: s
         return False
 
 
+def checkUserUnique(Conn: mysql.connector.MySQLConnection, username: str):
+    cursor = Conn.cursor(buffered = True)
+    try:
+        cursor.execute("""
+            SELECT COUNT(`username`) FROM `user` WHERE `username` = %s;
+        """, (username, ))
+        Conn.commit()
+        for count in cursor:
+            if int(count[0]):
+                return False
+            else:
+                return True
+    except Exception as e:
+        print("[-] User not unique.\n" + str(e))
+        return False
+
+
 def queryUser():
     pass
 
