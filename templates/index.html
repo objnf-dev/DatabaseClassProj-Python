@@ -1,60 +1,121 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
- <head> 
-  <meta charset="utf-8" /> 
-  <title>车票管理系统 - 18271241</title> 
-  <!-- Bootstrap core CSS --> 
-  <link href="/static/bootstrap.min.css" rel="stylesheet" /> 
-  <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+<head>
+    <meta charset="utf-8"/>
+    <title>车票管理系统 - 18271241</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
         }
-      }
-    </style> 
-  <!-- Custom styles for this template --> 
-  <link href="/static/starter-template.css" rel="stylesheet" /> 
- </head> 
- <body> 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"> 
-   <div class="container-fluid"> 
-    <a class="navbar-brand" href="#">车票管理系统</a> 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="导航器"> <span class="navbar-toggler-icon"></span> </button> 
-    <div class="collapse navbar-collapse" id="navbarsDefault"> 
-     <ul class="navbar-nav me-auto mb-2 mb-md-0"> 
-      <li class="nav-item active"> <a class="nav-link" aria-current="page" href="#">主页</a> </li> 
-      <li class="nav-item"> <a class="nav-link" href="#order">订票</a> </li> 
-      <li class="nav-item"> <a class="nav-link" href="#refund" tabindex="-1">退票</a> </li> 
-      <li class="nav-item"> <a class="nav-link" href="#query" tabindex="-1">查询</a></li>
-     </ul> 
-     <span class="navbar-text">
-        {% if session["isAdmin"] %}
-          管理员
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="/static/starter-template.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">车票管理系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsDefault"
+                aria-controls="navbarsDefault" aria-expanded="false" aria-label="导航器"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarsDefault">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item active"><a class="nav-link" aria-current="page" href="/">查询</a></li>
+                <li class="nav-item"><a class="nav-link" href="/order" tabindex="-1">订票</a></li>
+                <li class="nav-item"><a class="nav-link" href="/refund" tabindex="-1">退票</a></li>
+                {% if session["is_admin"] %}
+                    <li class="nav-item"><a class="nav-link" href="/admin" tabindex="-1">控制台</a></li>
+                {% endif %}
+            </ul>
+            <span class="navbar-text">
+        {% if session["is_admin"] %}
+            管理员
         {% else %}
-          用户
+            用户
         {% endif %}
-      {{ session["user"] }}
+                {{ session["user"] }}
     </span>
-    &nbsp;&nbsp;
-    <button class="btn btn-outline-success" onclick="(function() { window.location.href = '/logout';})();">退出登录</button>
-    </div> 
-   </div> 
-  </nav> 
-  <main class="container"> 
-   <div class="starter-template text-center py-5 px-3"> 
-    <h1>Bootstrap starter template</h1> 
-    <p class="lead">Use this document as a way to quickly start any new project.<br /> All you get is this text and a mostly barebones HTML document.</p> 
-   </div> 
-  </main>
-  <!-- /.container --> 
-  <script src="/static/bootstrap.bundle.min.js"></script>  
- </body>
+            <button class="btn btn-outline-success" onclick="(function() { window.location.href = '/logout';})();">
+                退出登录
+            </button>
+        </div>
+    </div>
+</nav>
+<main class="container">
+    <!-- Toasts -->
+    <div class="toast-container position-absolute top-0 end-0 p-3">
+        <div class="toast d-flex align-items-center text-white bg-primary border-0" role="alert"
+             aria-atomic="true">
+            <div class="toast-body">
+                Hello, world! This is a toast message.
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+    <div>
+        <form class="row g-3 w-75" style="margin: auto;">
+            <div class="col-md-4">
+                车次
+                <input id="train_name" type="text" class="form-control" placeholder="G1234">
+            </div>
+            <div class="col-md-4">
+                始发站
+                <input id="start_station" type="text" class="form-control" placeholder="杭州">
+            </div>
+            <div class="col-md-4">
+                终点站
+                <input id="stop_station" type="text" class="form-control" placeholder="上海">
+            </div>
+            <div class="col-md-6">
+                上车时间
+                <input id="start_time" type="datetime-local" class="form-control"
+                       placeholder="2020-01-01 12:00:00">
+            </div>
+            <div class="col-md-6">
+                下车时间
+                <input id="stop_time" type="datetime-local" class="form-control"
+                       placeholder="2020-01-01 18:00:00">
+            </div>
+            <div class="col-md-11"></div>
+            <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
+        </form>
+    </div>
+    <br/><br/>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">车次</th>
+            <th scope="col">始发站</th>
+            <th scope="col">始发时间</th>
+            <th scope="col">终点站</th>
+            <th scope="col">到达时间</th>
+            <th scope="col">票价</th>
+            <th scope="col">余量</th>
+        </tr>
+        </thead>
+        <tbody id="queryRes">
+
+        </tbody>
+    </table>
+</main>
+
+
+<script src="/static/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+
+</script>
 </html>

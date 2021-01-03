@@ -49,3 +49,11 @@ def reg():
             return "ok"
         else:
             abort(401)
+
+
+# Logout
+@routes.route("/logout")
+def logout():
+    session.pop("user", None)
+    session.pop("is_admin", None)
+    return redirect("/login")

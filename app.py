@@ -7,7 +7,8 @@ from routes import *
 
 # App settings
 app = Flask(__name__)
-app.secret_key = os.urandom(32)
+# app.secret_key = os.urandom(32)
+app.secret_key = "1234"
 
 app.register_blueprint(routes)
 
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     # Check install status
     if not os.path.isfile("install.lock"):
         dbConn = utils.createDB.noDBConn(config["Database"]["username"], config["Database"]["password"],
-                                   config["Database"]["host"], config["Database"]["port"])
+                                         config["Database"]["host"], config["Database"]["port"])
         utils.createDB.createDB(dbConn)
         utils.createDB.createTable(dbConn, config["Admin"])
         with open("install.lock", "w"):

@@ -9,7 +9,7 @@ DBConn = None
 
 def connectDB(username: str, password: str, host: str, port: int, dbname: str):
     try:
-        newConn = mysql.connector.connect(user = username, password = password, host = host, port = port, database = dbname)
+        newConn = mysql.connector.connect(user=username, password=password, host=host, port=port, database=dbname)
     except Exception as e:
         print("[-] Unable to connect to database.\n" + str(e))
         sys.exit(errno.DB_CONN_ERROR)
@@ -17,8 +17,8 @@ def connectDB(username: str, password: str, host: str, port: int, dbname: str):
 
 
 def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: str):
-    cursor = Conn.cursor(buffered = True) 
-    try: 
+    cursor = Conn.cursor(buffered=True)
+    try:
         cursor.execute("""
             INSERT INTO user(`username`, `password`, `gid`, `is_admin`) VALUES
             (%s, MD5(%s), NULL, 0);
@@ -32,9 +32,9 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
         return False
 
 
-def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat: str, 
-    startTime: datetime, endStat: str, endTime: datetime, capacity: int, price: float):
-    cursor = Conn.cursor(buffered = True)
+def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat: str,
+                startTime: datetime, endStat: str, endTime: datetime, capacity: int, price: float):
+    cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
             INSERT INTO train(`train_name`, `start_station`, `start_time`, `stop_station`, 
@@ -51,11 +51,11 @@ def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat
 
 
 def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: str):
-    cursor = Conn.cursor(buffered = True)
+    cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
             SELECT `password`, `is_admin` FROM `user` WHERE `username` = %s;
-        """, (username, ))
+        """, (username,))
         Conn.commit()
         for sqlpwd in cursor:
             if md5(password.encode("ascii")).hexdigest() == sqlpwd[0]:
@@ -69,11 +69,11 @@ def checkLogin(Conn: mysql.connector.MySQLConnection, username: str, password: s
 
 
 def checkUserUnique(Conn: mysql.connector.MySQLConnection, username: str):
-    cursor = Conn.cursor(buffered = True)
+    cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
             SELECT COUNT(`username`) FROM `user` WHERE `username` = %s;
-        """, (username, ))
+        """, (username,))
         Conn.commit()
         for count in cursor:
             if int(count[0]):
@@ -89,16 +89,30 @@ def queryUser():
     pass
 
 
-def queryTrainByName():
-    pass
-
-
-def queryTrainByStation():
-    pass
-
-
-def queryTrainByTime():
-    pass
-
+def queryTrainByName(Conn: mysql.connector.MySQLConnection, info):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        num = 0
+        checkList = ["train_name", "start_station", "start_time", "stop_station", "stop_time"]
+        param = ()
+        sql = "SELECT * FROM `train` WHERE"
+        for item in checkList:
+            if item in info:
+                if not num:
+                    sql += "`{}` = %s".format(item)
+                else:
+                    sql += "AND `{}` = %s".format(item)
+                num = num + 1
+            param += info[item]
+        sql += ";"
+        cursor.execute(sql, param)
+        Conn.commit()
+        result = []
+        for train in cursor:
+            result.append(train)
+        return True, result
+    except Exception as e:
+        print("[-] Check train info error.\n" + str(e))
+        return False, None
 
 
