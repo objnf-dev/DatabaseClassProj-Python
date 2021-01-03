@@ -55,8 +55,8 @@
 </nav>
 <main class="container">
     <!-- Toasts -->
-    <div class="toast-container position-absolute top-0 end-0 p-3">
-        <div class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
+    <div class="toast-container position-absolute top-10 end-0 p-3">
+        <div id="failedToast" class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
              aria-atomic="true">
             <div class="toast-body">
                 所有值不能同时为空。
@@ -116,6 +116,34 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+    function runQuery() {
+        let train_name = document.getElementById("train_name").value;
+        let start_station = document.getElementById("start_station").value;
+        let stop_station = document.getElementById("stop_station").value;
+        let start_time = document.getElementById("start_time").value;
+        let stop_time = document.getElementById("stop_time").value;
 
+        if (!train_name && !start_station && !stop_station && !start_time && !stop_time) {
+            let toast = new bootstrap.Toast(document.getElementById("failedToast"));
+            toast.show();
+        }
+        else {
+            let formData = new URLSearchParams();
+            formData.append("train_name", train_name);
+            formData.append("start_station", start_station);
+            formData.append("stop_station", stop_station);
+            formData.append("start_time", start_time);
+            formData.append("stop_time", stop_time);
+
+            window.fetch("/query", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            })
+        }
+    }
 </script>
 </html>

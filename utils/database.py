@@ -89,11 +89,12 @@ def queryUser():
     pass
 
 
-def queryTrainByName(Conn: mysql.connector.MySQLConnection, info):
+def queryTrain(Conn: mysql.connector.MySQLConnection, info):
+    print(info)
     cursor = Conn.cursor(buffered=True)
     try:
         num = 0
-        checkList = ["train_name", "start_station", "start_time", "stop_station", "stop_time"]
+        checkList = ["train_name", "start_station", "stop_station"]
         param = ()
         sql = "SELECT * FROM `train` WHERE"
         for item in checkList:
@@ -103,13 +104,25 @@ def queryTrainByName(Conn: mysql.connector.MySQLConnection, info):
                 else:
                     sql += "AND `{}` = %s".format(item)
                 num = num + 1
-            param += info[item]
+                param += (info[item], )
+        if "start_time" in info:
+            if not num:
+                sql += "`start_time` >= %s"
+            else:
+                sql += "AND `start_time >= %s"
+        if "stop_time" in info:
+            if not num:
+                sql += "`stop_time` <= %s"
+            else:
+                sql += "AND `stop_time` <= %s"
         sql += ";"
         cursor.execute(sql, param)
         Conn.commit()
-        result = []
+        result = {}
+        num = 0
         for train in cursor:
-            result.append(train)
+            num += 1
+            result[str(num)] = train
         return True, result
     except Exception as e:
         print("[-] Check train info error.\n" + str(e))

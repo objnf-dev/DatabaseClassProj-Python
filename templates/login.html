@@ -57,13 +57,13 @@
         let username = document.getElementById("inputUsername").value;
         let password = document.getElementById("inputPassword").value;
 
-        formData = new URLSearchParams();
+        let formData = new URLSearchParams();
         formData.append("username", username);
         formData.append("password", password);
 
         window.fetch("/login", {
             method: "POST",
-            credentials: 'same-origin',
+            credentials: "same-origin",
             redirect: "follow",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -71,11 +71,11 @@
             body: formData
         }).then(function (res) {
             if (!res.ok) {
-                loginAlert = document.getElementById("failedAlert");
+                let loginAlert = document.getElementById("failedAlert");
                 loginAlert.style.display = "";
             }
             else {
-                loginAlert = document.getElementById("failedAlert");
+                let loginAlert = document.getElementById("failedAlert");
                 loginAlert.style.display = "none";
                 loginAlert = document.getElementById("successAlert");
                 loginAlert.style.display = ""
