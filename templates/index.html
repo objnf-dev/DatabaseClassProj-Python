@@ -46,7 +46,7 @@
             用户
         {% endif %}
                 {{ session["user"] }}
-    </span>
+            </span>
             <button class="btn btn-outline-success" onclick="(function() { window.location.href = '/logout';})();">
                 退出登录
             </button>
@@ -56,10 +56,10 @@
 <main class="container">
     <!-- Toasts -->
     <div class="toast-container position-absolute top-0 end-0 p-3">
-        <div class="toast d-flex align-items-center text-white bg-primary border-0" role="alert"
+        <div class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
              aria-atomic="true">
             <div class="toast-body">
-                Hello, world! This is a toast message.
+                所有值不能同时为空。
             </div>
             <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
                     aria-label="Close"></button>
