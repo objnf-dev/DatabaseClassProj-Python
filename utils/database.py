@@ -90,7 +90,6 @@ def queryUser():
 
 
 def queryTrain(Conn: mysql.connector.MySQLConnection, info):
-    print(info)
     cursor = Conn.cursor(buffered=True)
     try:
         num = 0

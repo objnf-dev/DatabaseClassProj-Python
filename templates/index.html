@@ -45,7 +45,8 @@
         {% else %}
             用户
         {% endif %}
-                {{ session["user"] }}
+        {{ session["user"] }}
+            &nbsp;&nbsp;
             </span>
             <button class="btn btn-outline-success" onclick="(function() { window.location.href = '/logout';})();">
                 退出登录
@@ -60,6 +61,14 @@
              aria-atomic="true">
             <div class="toast-body">
                 所有值不能同时为空。
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+        <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
+             aria-atomic="true">
+            <div class="toast-body">
+                查询出错，请重试。
             </div>
             <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
                     aria-label="Close"></button>
@@ -142,6 +151,16 @@
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: formData
+            }).then(function (res) {
+                if(!res.ok) {
+                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                    toast.show();
+                }
+                else {
+                    let table = document.getElementById("queryRes");
+                    let frag = new DocumentFragment();
+
+                }
             })
         }
     }
