@@ -91,12 +91,12 @@
             <div class="col-md-6">
                 上车时间
                 <input id="start_time" type="datetime-local" class="form-control"
-                       placeholder="2020-01-01 12:00:00">
+                       placeholder="2020-01-01 12:00">
             </div>
             <div class="col-md-6">
                 下车时间
                 <input id="stop_time" type="datetime-local" class="form-control"
-                       placeholder="2020-01-01 18:00:00">
+                       placeholder="2020-01-01 18:00">
             </div>
             <div class="col-md-11"></div>
             <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
@@ -125,6 +125,9 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+
+
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
         let start_station = document.getElementById("start_station").value;
@@ -155,11 +158,15 @@
                 if(!res.ok) {
                     let toast = new bootstrap.Toast(document.getElementById("errorToast"));
                     toast.show();
+                    return ""
                 }
                 else {
+                    return res.text()
+                }
+            }).then(function (data) {
+                if(data) {
                     let table = document.getElementById("queryRes");
-                    let frag = new DocumentFragment();
-
+                    table.innerHTML = data;
                 }
             })
         }

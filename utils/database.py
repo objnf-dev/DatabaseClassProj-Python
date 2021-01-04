@@ -95,23 +95,23 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
         num = 0
         checkList = ["train_name", "start_station", "stop_station"]
         param = ()
-        sql = "SELECT * FROM `train` WHERE"
+        sql = "SELECT * FROM `train`"
         for item in checkList:
             if item in info:
                 if not num:
-                    sql += "`{}` = %s".format(item)
+                    sql += "WHERE `{}` = %s".format(item)
                 else:
                     sql += "AND `{}` = %s".format(item)
                 num = num + 1
                 param += (info[item], )
         if "start_time" in info:
             if not num:
-                sql += "`start_time` >= %s"
+                sql += "WHERE `start_time` >= %s"
             else:
                 sql += "AND `start_time >= %s"
         if "stop_time" in info:
             if not num:
-                sql += "`stop_time` <= %s"
+                sql += "WHERE `stop_time` <= %s"
             else:
                 sql += "AND `stop_time` <= %s"
         sql += ";"

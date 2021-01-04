@@ -9,6 +9,7 @@ from routes import *
 app = Flask(__name__)
 # app.secret_key = os.urandom(32)
 app.secret_key = "1234"
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 app.register_blueprint(routes)
 

@@ -24,25 +24,36 @@
   <link href="/static/starter-template.css" rel="stylesheet" /> 
  </head> 
  <body> 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"> 
-   <div class="container-fluid"> 
-    <a class="navbar-brand" href="#">Navbar</a> 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault"> 
-     <ul class="navbar-nav me-auto mb-2 mb-md-0"> 
-      <li class="nav-item active"> <a class="nav-link" aria-current="page" href="#">Home</a> </li> 
-      <li class="nav-item"> <a class="nav-link" href="#">Link</a> </li> 
-      <li class="nav-item"> <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> </li> 
-      <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a> 
-       <ul class="dropdown-menu" aria-labelledby="dropdown01"> 
-        <li><a class="dropdown-item" href="#">Action</a></li> 
-        <li><a class="dropdown-item" href="#">Another action</a></li> 
-        <li><a class="dropdown-item" href="#">Something else here</a></li> 
-       </ul> </li> 
-     </ul> 
-    </div> 
-   </div> 
-  </nav> 
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">车票管理系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsDefault"
+                aria-controls="navbarsDefault" aria-expanded="false" aria-label="导航器"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarsDefault">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item active"><a class="nav-link" aria-current="page" href="/">查询</a></li>
+                <li class="nav-item"><a class="nav-link" href="/order" tabindex="-1">订票</a></li>
+                <li class="nav-item"><a class="nav-link" href="/refund" tabindex="-1">退票</a></li>
+                {% if session["is_admin"] %}
+                    <li class="nav-item"><a class="nav-link" href="/admin" tabindex="-1">控制台</a></li>
+                {% endif %}
+            </ul>
+            <span class="navbar-text">
+        {% if session["is_admin"] %}
+            管理员
+        {% else %}
+            用户
+        {% endif %}
+                {{ session["user"] }}
+            &nbsp;&nbsp;
+            </span>
+            <button class="btn btn-outline-success" onclick="(function() { window.location.href = '/logout';})();">
+                退出登录
+            </button>
+        </div>
+    </div>
+</nav>
   <main class="container"> 
    <div class="starter-template text-center py-5 px-3"> 
     <h1>Bootstrap starter template</h1> 
