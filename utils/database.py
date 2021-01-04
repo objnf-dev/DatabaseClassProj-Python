@@ -99,21 +99,23 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
         for item in checkList:
             if item in info:
                 if not num:
-                    sql += "WHERE `{}` = %s".format(item)
+                    sql += "WHERE `{}` = %s ".format(item)
                 else:
-                    sql += "AND `{}` = %s".format(item)
+                    sql += "AND `{}` = %s ".format(item)
                 num = num + 1
                 param += (info[item], )
         if "start_time" in info:
             if not num:
-                sql += "WHERE `start_time` >= %s"
+                sql += "WHERE `start_time` >= %s "
             else:
-                sql += "AND `start_time >= %s"
+                sql += "AND `start_time >= %s "
+            param += (info["start_time"], )
         if "stop_time" in info:
             if not num:
-                sql += "WHERE `stop_time` <= %s"
+                sql += "WHERE `stop_time` <= %s "
             else:
-                sql += "AND `stop_time` <= %s"
+                sql += "AND `stop_time` <= %s "
+            param += (info["stop_time"], )
         sql += ";"
         cursor.execute(sql, param)
         Conn.commit()
@@ -126,5 +128,4 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
     except Exception as e:
         print("[-] Check train info error.\n" + str(e))
         return False, None
-
 
