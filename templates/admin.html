@@ -175,6 +175,8 @@
     let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
             "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
 
+    let trainName = ""
+
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
 
@@ -216,6 +218,7 @@
 
     function listButtonClicked(ele) {
         let infoList = ele.parentNode.parentNode.children;
+        trainName = infoList[0].innerText;
         for (let i = 0; i < 7; i++) {
             let tmpEle = document.getElementById(checkList[i]);
             let originVal = infoList[i].innerText;
@@ -237,6 +240,7 @@
     function submitTrain() {
         let formData = new URLSearchParams();
         let unmodified = 0;
+        formData.append("train_name_origin", trainName)
         for (let i = 0; i < 7; i++) {
             let tmpEle = document.getElementById(checkList[i]);
             if (tmpEle.value === "") {
@@ -254,7 +258,7 @@
             toast.show();
             return;
         }
-        window.fetch("/change", {
+        window.fetch("/api/change", {
             method: "POST",
             credentials: "same-origin",
             redirect: "follow",

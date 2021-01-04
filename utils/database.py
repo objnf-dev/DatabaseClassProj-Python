@@ -224,3 +224,25 @@ def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
     except Exception as e:
         print("[-] Pay for order failed.\n" + str(e))
         return False
+
+
+def updateTrain(Conn: mysql.connector.MySQLConnection, trainInfo: list, train_name_origin: str):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        cursor.execute("BEGIN;")
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+        cursor.execute("""
+            UPDATE `train` SET `train_name` = %s, `start_station` = %s, `start_time` = %s,
+            `stop_station` = %s, `stop_time` = %s, `capacity` = %s, `price` = %s
+            WHERE `train_name` = %s;
+        """,(trainInfo[0], trainInfo[1], trainInfo[2], trainInfo[3], trainInfo[4], trainInfo[5], trainInfo[6], train_name_origin))
+        cursor.execute("""
+            UPDATE `order` SET `train` = %s WHERE `train` = %s;
+        """, (trainInfo[0], train_name_origin))
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
+        cursor.execute("COMMIT;")
+        Conn.commit()
+        return True
+    except Exception as e:
+        print("[-] Update train error.\n" + str(e))
+        return False

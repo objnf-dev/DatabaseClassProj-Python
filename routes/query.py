@@ -39,3 +39,8 @@ def queryUser():
     if not status:
         abort(500)
     return render_template("userlist.html", data=res)
+
+
+@routes.route("/api/query_order", methods=["POST"])
+def queryOrder():
+    pass
