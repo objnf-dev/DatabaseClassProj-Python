@@ -172,7 +172,9 @@ def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
         cursor.execute("""
             SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);
             SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
+            SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = (SELECT `train` FROM `order` WHERE `oid` = %s));
             UPDATE `user` SET `price` = @remain + @price;
+            UPDATE `train` SET `capacity` = @capa + 1;
             DELETE FROM `order` WHERE `oid` = %s;
         """, (oid, username, oid ))
         return True

@@ -131,7 +131,7 @@
         formData.append("start_time", start_time);
         formData.append("stop_time", stop_time);
 
-        window.fetch("/query", {
+        window.fetch("/api/query", {
             method: "POST",
             credentials: "same-origin",
             headers: {

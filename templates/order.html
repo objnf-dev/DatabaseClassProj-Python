@@ -65,7 +65,7 @@
             </div>
             <div id="valueEmptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
                 <div class="toast-body">
-                    数据不能为空。
+                    请选择用户。
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" onclick="submitTrain()">应用</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOrder()">应用</button>
                 </div>
             </div>
         </div>
@@ -132,7 +132,7 @@
         let formData = new URLSearchParams();
         formData.append("train_name", train_name);
 
-        window.fetch("/query_list", {
+        window.fetch("/api/query_list", {
             method: "POST",
             credentials: "same-origin",
             headers: {
@@ -166,7 +166,7 @@
     }
 
     function listButtonClicked(ele) {
-            window.fetch("/query_user", {
+            window.fetch("/api/query_user", {
                 method: "GET",
                 credentials: "same-origin",
                 headers: {
@@ -183,6 +183,38 @@
                 form = document.getElementById("usernameList");
                 form.innerHTML = data;
             });
+    }
+
+    function submitOrder() {
+        let checkboxList = [].slice.call(document.querySelectorAll(".form-check-input"));
+        let groupOrder = -1;
+        let userList = [];
+        for(let i=0; i<checkboxList.length; i++) {
+            if(checkboxList[i].checked) {
+                groupOrder += 1;
+                userList.push(checkboxList[i].value);
+            }
+        }
+
+        if(groupOrder === -1) {
+            let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
+            toast.show();
+        }
+        else if(groupOrder === 0) {
+            
+            window.fetch("/api/order", {
+                method: "POST",
+                credentials: "same-origin",
+                redirect: "follow",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            })
+        }
+        else {
+
+        }
     }
 
     runQuery();

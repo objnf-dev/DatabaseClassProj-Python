@@ -181,7 +181,7 @@
         let formData = new URLSearchParams();
         formData.append("train_name", train_name);
 
-        window.fetch("/query_list", {
+        window.fetch("/api/query_list", {
             method: "POST",
             credentials: "same-origin",
             headers: {

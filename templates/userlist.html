@@ -1,12 +1,12 @@
 {% for item in data %}
     {% if data[item] != session["user"] %}
         <div class="form-check col-md-3">
-            <input class="form-check-input" type="checkbox" value="" id="username{{ item }}">
+            <input class="form-check-input" type="checkbox" value="{{ data[item] }}" id="username{{ item }}">
             <label class="form-check-label" for="username{{ item }}">{{ data[item] }}</label>
         </div>
     {% else %}
         <div class="form-check col-md-3">
-            <input class="form-check-input" type="checkbox" value="" id="username{{ item }}" checked>
+            <input class="form-check-input" type="checkbox" value="{{ data[item] }}" id="username{{ item }}" checked>
             <label class="form-check-label" for="username{{ item }}">{{ data[item] }}</label>
         </div>
     {% endif %}

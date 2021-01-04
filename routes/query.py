@@ -3,7 +3,7 @@ from . import routes
 import utils.database
 
 
-@routes.route("/query", methods=["POST"])
+@routes.route("/api/query", methods=["POST"])
 def query():
     if "user" not in session or "is_admin" not in session:
         abort(401)
@@ -18,7 +18,7 @@ def query():
         return render_template("list.html", info=res)
 
 
-@routes.route("/query_list", methods=["POST"])
+@routes.route("/api/query_list", methods=["POST"])
 def queryList():
     if "user" not in session or "is_admin" not in session:
         abort(401)
@@ -31,7 +31,7 @@ def queryList():
     return render_template("list_button.html", info=res)
 
 
-@routes.route("/query_user", methods=["GET"])
+@routes.route("/api/query_user", methods=["GET"])
 def queryUser():
     if "user" not in session or "is_admin" not in session:
         abort(401)

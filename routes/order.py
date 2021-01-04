@@ -10,7 +10,7 @@ def order():
     return render_template("order.html")
 
 
-@routes.route("/placeOrder", methods=["POST"])
+@routes.route("/api/order", methods=["POST"])
 def placeOrder():
     if "user" not in session or "is_admin" not in session:
         abort(401)
@@ -23,3 +23,8 @@ def refund():
     if "user" not in session or "is_admin" not in session:
         return redirect("/login")
     return render_template("refund.html")
+
+
+@routes.route("/api/refund", methods=["POST"])
+def rmOrder():
+    pass
