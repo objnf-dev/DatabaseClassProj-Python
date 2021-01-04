@@ -57,13 +57,75 @@
 <main class="container">
     <!-- Toasts -->
     <div class="toast-container position-absolute top-10 end-0 p-3">
-        <div id="emptyToast" class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
-             aria-atomic="true">
+        <div id="emptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
             <div class="toast-body">
                 车次不能为空。
             </div>
-            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div class="modal fade" id="trainValue" tabindex="-1">
+        <div class="toast-container position-absolute top-10 end-0 p-3">
+            <div id="unmodifiedToast" class="toast d-flex align-items-center text-white bg-primary border-0">
+                <div class="toast-body">
+                    没有信息被修改。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
+            <div id="valueEmptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
+                <div class="toast-body">
+                    数据不能为空。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">列车信息</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3" style="margin: auto;">
+                        <div class="col-md-4">
+                            车次
+                            <input id="train_name_modified" type="text" class="form-control" placeholder="G1234">
+                        </div>
+                        <div class="col-md-4">
+                            始发站
+                            <input id="start_station_modified" type="text" class="form-control" placeholder="杭州">
+                        </div>
+                        <div class="col-md-4">
+                            终点站
+                            <input id="stop_station_modified" type="text" class="form-control" placeholder="上海">
+                        </div>
+                        <div class="col-md-6">
+                            始发时间
+                            <input id="start_time_modified" type="datetime-local" class="form-control"
+                                   placeholder="2020-01-01 12:00">
+                        </div>
+                        <div class="col-md-6">
+                            到达时间
+                            <input id="stop_time_modified" type="datetime-local" class="form-control"
+                                   placeholder="2020-01-01 18:00">
+                        </div>
+                        <div class="col-md-4">
+                            票价
+                            <input id="price_modified" type="number" step="0.1" min="0.0" class="form-control"
+                                   placeholder="25.0">
+                        </div>
+                        <div class="col-md-4">
+                            余量
+                            <input id="capacity_modified" type="number" step="1" min="0" class="form-control"
+                                   placeholder="200">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTrain(this)">确定</button>
+                </div>
+            </div>
         </div>
     </div>
     <div>
@@ -76,7 +138,9 @@
             </div>
             <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
             <div class="col-md-1"></div>
-            <button type="button" onclick="" class="btn btn-primary col-md-2">添加列车</button>
+            <button type="button" class="btn btn-primary col-md-2" data-bs-toggle="modal"
+                    data-bs-target="#trainValue">添加列车
+            </button>
         </form>
     </div>
     <br/><br/>
@@ -107,12 +171,8 @@
 
         let formData = new URLSearchParams();
         formData.append("train_name", train_name);
-        formData.append("start_station", start_station);
-        formData.append("stop_station", stop_station);
-        formData.append("start_time", start_time);
-        formData.append("stop_time", stop_time);
 
-        window.fetch("/query", {
+        window.fetch("/query_list", {
             method: "POST",
             credentials: "same-origin",
             headers: {
@@ -132,8 +192,68 @@
                 let table = document.getElementById("queryRes");
                 table.innerHTML = data;
             }
-        });
+        }).then(function () {
+            modifyListButton();
+        })
     }
+
+    function modifyListButton() {
+        let buttonList = [].slice.call(document.querySelectorAll(".listButton"))
+        for (let i = 0; i < buttonList.length; i++) {
+            buttonList[i].setAttribute("data-bs-toggle", "modal");
+            buttonList[i].setAttribute("data-bs-target", "#trainValue");
+        }
+    }
+
+    function listButtonClicked(ele) {
+        let infoList = ele.parentNode.parentNode.children;
+        let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
+            "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
+        for (let i = 0; i < 7; i++) {
+            let tmpEle = document.getElementById(checkList[i]);
+            let originVal = infoList[i].innerText;
+            if (originVal === "") {
+                continue;
+            }
+            tmpEle.value = originVal;
+            tmpEle.placeholder = originVal;
+        }
+    }
+
+    function submitTrain(ele) {
+        let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
+            "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
+        let formData = new URLSearchParams();
+        let unmodified = 0;
+        for (let i = 0; i < 7; i++) {
+            let tmpEle = document.getElementById(checkList[i]);
+            if (tmpEle.value === "") {
+                let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
+                toast.show();
+                return;
+            }
+            if (tmpEle.value !== tmpEle.placeholder) {
+                unmodified = 1;
+            }
+            formData.append(checkList[i].slice(0, -9), tmpEle.value);
+        }
+        if (!unmodified) {
+            let toast = new bootstrap.Toast(document.getElementById("unmodifiedToast"));
+            toast.show();
+            return;
+        }
+        window.fetch("/change", {
+            method: "POST",
+            credentials: "same-origin",
+            redirect: "follow",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        })
+    }
+
+    runQuery();
 
 </script>
 

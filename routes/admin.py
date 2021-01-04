@@ -19,4 +19,5 @@ def change():
     elif not session["is_admin"]:
         abort(401)
     info = {}
+
     return render_template("list_button.html", info=info)

@@ -1,5 +1,5 @@
 {% for item in info %}
-    <tr>
+    <tr id="item{{ item }}">
         <td> {{ info[item][0] }} </td>
         <td> {{ info[item][1] }} </td>
         <td> {{ info[item][2] }} </td>
@@ -8,7 +8,7 @@
         <td> {{ info[item][6] }} </td>
         <td> {{ info[item][5] }} </td>
         <td>
-            <button type="button" class="btn-primary btn" data-bs-toggle="editModal" data-bs-target="#editData"></button>
+            <button type="button" class="btn-primary btn-sm listButton" onclick="listButtonClicked(this)">执行</button>
         </td>
     </tr>
 {% else %}

@@ -77,7 +77,7 @@
             <th scope="col">到达时间</th>
             <th scope="col">票价</th>
             <th scope="col">余量</th>
-            <th scope="col">修改</th>
+            <th scope="col">购买</th>
         </tr>
         </thead>
         <tbody id="queryRes">
@@ -95,7 +95,7 @@
         let formData = new URLSearchParams();
         formData.append("train_name", train_name);
 
-        window.fetch("/placeOrder", {
+        window.fetch("/query_list", {
             method: "POST",
             credentials: "same-origin",
             headers: {
