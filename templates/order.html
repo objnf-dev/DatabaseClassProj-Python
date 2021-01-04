@@ -71,7 +71,7 @@
             </div>
             <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0">
                 <div class="toast-body">
-                    修改出错，请重试。
+                    下单出错，请重试。
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
@@ -126,7 +126,7 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
-    let trainNum = "";
+    let trainName = "";
 
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
@@ -168,7 +168,7 @@
     }
 
     function listButtonClicked(ele) {
-        trainNum = ele.parentNode.parentNode.children[0].innerText;
+        trainName = ele.parentNode.parentNode.children[0].innerText;
 
         window.fetch("/api/query_user", {
             method: "GET",
@@ -203,6 +203,9 @@
             let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
             toast.show();
         } else if (groupOrder === 0) {
+            let formData = new URLSearchParams();
+            formData.append("username", userList[0]);
+            formData.append("train_name", trainName);
 
             window.fetch("/api/order", {
                 method: "POST",
@@ -212,7 +215,12 @@
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: formData
-            })
+            }).then(function (res) {
+                if(!res.ok) {
+                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                    toast.show();
+                }
+            });
         } else {
 
         }

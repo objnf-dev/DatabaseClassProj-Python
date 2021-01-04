@@ -14,8 +14,14 @@ def order():
 def placeOrder():
     if "user" not in session or "is_admin" not in session:
         abort(401)
-    info = {}
-    return render_template("list_button.html", info=info)
+    if "username" in request.form and request.form["username"] and "train" in request.form and request.form["train_name"]:
+        status = utils.database.placeOrder(utils.database.DBConn, request.form["train_name"], request.form["username"])
+        if status:
+            return "ok"
+        else:
+            abort(500)
+    else:
+        abort(500)
 
 
 @routes.route("/refund")
