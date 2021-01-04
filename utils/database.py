@@ -116,7 +116,7 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
             else:
                 sql += "AND `stop_time` <= %s "
             param += (info["stop_time"], )
-        sql += ";"
+        sql += "ORDER BY `start_time`;"
         cursor.execute(sql, param)
         Conn.commit()
         result = {}

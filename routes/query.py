@@ -1,10 +1,12 @@
-from flask import session, request, render_template
+from flask import session, abort, request, render_template
 from . import routes
 import utils.database
 
 
 @routes.route("/query", methods=["POST"])
 def queryTrain():
+    if "user" not in session or "is_admin" not in session:
+        abort(401)
     info = {}
     for item in request.form:
         if request.form[item] != "":
