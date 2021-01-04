@@ -28,7 +28,7 @@ def change():
                      request.form["capacity"]]
         status = utils.database.updateTrain(utils.database.DBConn, trainInfo, request.form["train_name_origin"])
         if status:
-            return True
+            return "ok"
         else:
             abort(500)
     else:

@@ -219,6 +219,7 @@
                 else {
                     let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
                     modal.hide();
+                    setTimeout(function () {location.reload();}, 500);
                 }
             });
         } else {
@@ -243,6 +244,7 @@
                 else {
                     let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
                     modal.hide();
+                    setTimeout(function () {location.reload();}, 500);
                 }
             })
         }

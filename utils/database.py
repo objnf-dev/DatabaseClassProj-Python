@@ -152,6 +152,8 @@ def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str,
         cursor.execute("BEGIN;")
         cursor.execute("SET @price = (SELECT `price` FROM `train` WHERE `train_name` = %s);", (train, ))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
+        cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = %s);", (train, ))
+        cursor.execute("UPDATE `train` SET `capacity` = @capa - 1 WHERE `train_name` = %s;", (train, ))
         if status == "1":
             cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (username, ))
         cursor.execute("""INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`, `timestamp`) VALUES
@@ -172,8 +174,10 @@ def placeGroupOrder(Conn: mysql.connector.MySQLConnection, currentUser:str, user
         cursor.execute("BEGIN;")
         cursor.execute("INSERT INTO `group`(`admin`, `timestamp`) VALUES (%s, %s);", (currentUser, currentTime))
         cursor.execute("SET @gid = (SELECT `id` FROM `group` WHERE `timestamp` = %s);", (currentTime, ))
+        cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = %s);", (train,))
         userNum = len(usernameList)
         cursor.execute("SET @price = %s * (SELECT `price` FROM `train` WHERE `train_name` = %s);", (userNum, train))
+        cursor.execute("UPDATE `train` SET `capacity` = @capa + %s WHERE `train_name` = %s;", (userNum, train))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (currentUser,))
         if status == "1":
             cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (currentUser,))
@@ -235,7 +239,7 @@ def updateTrain(Conn: mysql.connector.MySQLConnection, trainInfo: list, train_na
             UPDATE `train` SET `train_name` = %s, `start_station` = %s, `start_time` = %s,
             `stop_station` = %s, `stop_time` = %s, `capacity` = %s, `price` = %s
             WHERE `train_name` = %s;
-        """,(trainInfo[0], trainInfo[1], trainInfo[2], trainInfo[3], trainInfo[4], trainInfo[5], trainInfo[6], train_name_origin))
+        """,(trainInfo[0], trainInfo[1], trainInfo[2], trainInfo[3], trainInfo[4], trainInfo[6], trainInfo[5], train_name_origin))
         cursor.execute("""
             UPDATE `order` SET `train` = %s WHERE `train` = %s;
         """, (trainInfo[0], train_name_origin))
