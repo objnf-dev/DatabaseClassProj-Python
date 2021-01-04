@@ -39,7 +39,7 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `password` CHAR(32) NOT NULL,
                 `gid` INT,
                 `is_admin` TINYINT(1) NOT NULL,
-                `balance` FLOAT NOT NULL
+                `balance` FLOAT NOT NULL CHECK ( balance >= 0.0 )
             );
         """)
         cursor.execute("""
@@ -50,7 +50,7 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `stop_station` CHAR(10) NOT NULL,
                 `stop_time` DATETIME NOT NULL,
                 `capacity` INT NOT NULL,
-                `price` FLOAT NOT NULL CHECK(price >= 0.0)
+                `price` FLOAT NOT NULL CHECK ( price >= 0.0 )
             );
         """)
         cursor.execute("""
@@ -69,7 +69,7 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `train` CHAR(10) NOT NULL,
                 FOREIGN KEY (`train`) REFERENCES train(`train_name`),
                 `gid` INT,
-                `price` FLOAT NOT NULL,
+                `price` FLOAT NOT NULL CHECK ( price >= 0.0 ),
                 `status` TINYINT(1) NOT NULL
             );
         """)

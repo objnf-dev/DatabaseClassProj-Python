@@ -55,6 +55,17 @@
     </div>
 </nav>
 <main class="container">
+    <!-- Toasts -->
+    <div class="toast-container position-absolute top-10 end-0 p-3">
+        <div id="emptyToast" class="toast d-flex align-items-center text-white bg-danger border-0" role="alert"
+             aria-atomic="true">
+            <div class="toast-body">
+                车次不能为空。
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
     <div>
         <form class="row g-3 w-75 align-items-center row-cols-lg-auto justify-content-center" style="margin: auto;">
             <span>
@@ -63,7 +74,7 @@
             <div class="col-md-6">
                 <input type="text" id="train_name" class="form-control" placeholder="G1234">
             </div>
-                <button type="button" onclick="runquery()" class="btn btn-primary col-md-1">搜索</button>
+            <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
         </form>
     </div>
     <br/><br/>
@@ -89,7 +100,43 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+    function runQuery() {
+        let train_name = document.getElementById("train_name").value;
 
+        if (!train_name) {
+            let toast = new bootstrap.Toast(document.getElementById("emptyToast"));
+            toast.show();
+        } else {
+            let formData = new URLSearchParams();
+            formData.append("train_name", train_name);
+            formData.append("start_station", start_station);
+            formData.append("stop_station", stop_station);
+            formData.append("start_time", start_time);
+            formData.append("stop_time", stop_time);
+
+            window.fetch("/query", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            }).then(function (res) {
+                if (!res.ok) {
+                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                    toast.show();
+                    return ""
+                } else {
+                    return res.text()
+                }
+            }).then(function (data) {
+                if (data) {
+                    let table = document.getElementById("queryRes");
+                    table.innerHTML = data;
+                }
+            });
+        }
+    }
 
 </script>
 

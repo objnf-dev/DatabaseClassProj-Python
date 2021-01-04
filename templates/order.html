@@ -54,10 +54,43 @@
         </div>
     </div>
 </nav>
-  <main class="container"> 
+  <main class="container">
+    <div>
+        <form class="row g-3 w-75 align-items-center row-cols-lg-auto justify-content-center" style="margin: auto;">
+            <span>
+                车次
+            </span>
+            <div class="col-md-6">
+                <input type="text" id="train_name" class="form-control" placeholder="G1234">
+            </div>
+                <button type="button" onclick="runquery()" class="btn btn-primary col-md-1">搜索</button>
+        </form>
+    </div>
+    <br/><br/>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">车次</th>
+            <th scope="col">始发站</th>
+            <th scope="col">始发时间</th>
+            <th scope="col">终点站</th>
+            <th scope="col">到达时间</th>
+            <th scope="col">票价</th>
+            <th scope="col">余量</th>
+            <th scope="col">修改</th>
+        </tr>
+        </thead>
+        <tbody id="queryRes">
 
-  </main>
+        </tbody>
+    </table>
+</main>
   <!-- /.container --> 
   <script src="/static/bootstrap.bundle.min.js"></script>  
  </body>
+<script>
+
+
+</script>
+
 </html>

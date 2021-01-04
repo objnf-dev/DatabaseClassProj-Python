@@ -143,7 +143,21 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
 
 
 def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str, status: int):
-    pass
+    cursor = Conn.cursor(buffered=True)
+    try:
+        sql = """
+            SET @price = (SELECT `price` FROM `train` WHERE `train_name` = %s);
+            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
+        """
+        if status:
+            sql += "UPDATE `user` SET `price` = @remain - @price;"
+        sql += """INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`) VALUES
+                    (%s, %s, NULL, @price, %s);"""
+        cursor.execute(sql, (train, username, username, train, status))
+        return True
+    except Exception as e:
+        print("[-] Failed to place order.\n" + str(e))
+        return False
 
 
 def placeGroupOrder(Conn: mysql.connector.MySQLConnection, usernameList: list, train: str, gid: int, status: int):
@@ -170,4 +184,15 @@ def removeGroupOrder(Conn: mysql.connector.MySQLConnection):
 
 
 def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
-    pass
+    cursor = Conn.cursor(buffered=True)
+    try:
+        cursor.execute("""
+            SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);
+            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
+            UPDATE `user` SET `price` = @remain - @price;
+            UPDATE `order` SET `status` = 1 WHERE `oid` = %s;
+        """, (oid, username, oid))
+        return True
+    except Exception as e:
+        print("[-] Pay for order failed.\n" + str(e))
+        return False
