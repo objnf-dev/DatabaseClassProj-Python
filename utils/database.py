@@ -147,15 +147,15 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
 def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str, status: int):
     cursor = Conn.cursor(buffered=True)
     try:
-        sql = """
-            SET @price = (SELECT `price` FROM `train` WHERE `train_name` = %s);
-            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
-        """
-        if status:
-            sql += "UPDATE `user` SET `price` = @remain - @price;"
-        sql += """INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`) VALUES
-                    (%s, %s, NULL, @price, %s);"""
-        cursor.execute(sql, (train, username, username, train, status))
+        cursor.execute("BEGIN;")
+        cursor.execute("SET @price = (SELECT `price` FROM `train` WHERE `train_name` = %s);", (train, ))
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
+        if status == "1":
+            cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (username, ))
+        cursor.execute("""INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`) VALUES
+                    (%s, %s, NULL, @price, %s);""", (username, train, status))
+        cursor.execute("COMMIT;")
+        Conn.commit()
         return True
     except Exception as e:
         print("[-] Failed to place order.\n" + str(e))

@@ -87,7 +87,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" onclick="submitOrder()">应用</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOrder(0)">预订</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOrder(1)">下单</button>
                 </div>
             </div>
         </div>
@@ -188,7 +189,7 @@
         });
     }
 
-    function submitOrder() {
+    function submitOrder(status) {
         let checkboxList = [].slice.call(document.querySelectorAll(".form-check-input"));
         let groupOrder = -1;
         let userList = [];
@@ -206,6 +207,7 @@
             let formData = new URLSearchParams();
             formData.append("username", userList[0]);
             formData.append("train_name", trainName);
+            formData.append("status", status);
 
             window.fetch("/api/order", {
                 method: "POST",
@@ -220,9 +222,26 @@
                     let toast = new bootstrap.Toast(document.getElementById("errorToast"));
                     toast.show();
                 }
+                else {
+                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
+                    modal.hide();
+                }
             });
         } else {
+            let formData = new URLSearchParams();
+            formData.append("username", userList);
+            formData.append("train_name", trainName);
+            formData.append("status", status);
 
+            window.fetch("/api/group_order", {
+                method: "POST",
+                credentials: "same-origin",
+                redirect: "follow",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            })
         }
     }
 
