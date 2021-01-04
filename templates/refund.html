@@ -88,7 +88,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="submitOrder()">确定</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOpt()">确定</button>
                 </div>
             </div>
         </div>
@@ -115,7 +115,7 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
-    let trainName = "";
+    let orderID = "";
 
     function runQuery() {
         window.fetch("/api/query_order", {
@@ -148,7 +148,8 @@
     }
 
     function listButtonClicked(ele) {
-        childList = ele.parentNode.parentNode.children;
+        let childList = ele.parentNode.parentNode.children;
+        orderID = childList[0].innerText;
         if(childList[2].innerText === "是") {
             document.getElementById("selectGroupDel").style.display = "";
         }
@@ -157,19 +158,17 @@
         }
     }
 
-    function submitOrder(status) {
+    function submitOpt() {
         let option = document.getElementById("selectForm").value;
 
         if (option === "") {
             let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
             toast.show();
-        } else if (groupOrder === 0) {
+        } else if (option === "1") {
             let formData = new URLSearchParams();
-            formData.append("username", userList[0]);
-            formData.append("train_name", trainName);
-            formData.append("status", status);
+            formData.append("oid", orderID);
 
-            window.fetch("/api/order", {
+            window.fetch("/api/refund", {
                 method: "POST",
                 credentials: "same-origin",
                 redirect: "follow",
@@ -188,13 +187,13 @@
                     setTimeout(function () {location.reload();}, 500);
                 }
             });
-        } else {
-            let formData = new URLSearchParams();
-            formData.append("username", userList);
-            formData.append("train_name", trainName);
-            formData.append("status", status);
+        } else if (option === "2") {
 
-            window.fetch("/api/group_order", {
+        } else if (option === "3") {
+            let formData = new URLSearchParams();
+            formData.append("oid", orderID);
+
+            window.fetch("/api/pay", {
                 method: "POST",
                 credentials: "same-origin",
                 redirect: "follow",
@@ -212,7 +211,7 @@
                     modal.hide();
                     setTimeout(function () {location.reload();}, 500);
                 }
-            })
+            });
         }
     }
 

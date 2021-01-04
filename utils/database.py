@@ -33,15 +33,14 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
         return False
 
 
-def createTrain(Conn: mysql.connector.MySQLConnection, trainName: str, startStat: str,
-                startTime: datetime, endStat: str, endTime: datetime, capacity: int, price: float):
+def createTrain(Conn: mysql.connector.MySQLConnection, trainInfo: list):
     cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
             INSERT INTO train(`train_name`, `start_station`, `start_time`, `stop_station`, 
                 `stop_time`, `capacity`, `price`) VALUES
             (%s, %s, %s, %s, %s, %s, %s);
-        """, (trainName, startStat, startTime, endStat, endTime, capacity, price))
+        """, (trainInfo[0], trainInfo[1], trainInfo[2], trainInfo[3], trainInfo[4], trainInfo[6], trainInfo[5]))
         Conn.commit()
         cursor.close()
         return True
@@ -197,14 +196,16 @@ def placeGroupOrder(Conn: mysql.connector.MySQLConnection, currentUser:str, user
 def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
     cursor = Conn.cursor(buffered=True)
     try:
-        cursor.execute("""
-            SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);
-            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
-            SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = (SELECT `train` FROM `order` WHERE `oid` = %s));
-            UPDATE `user` SET `price` = @remain + @price;
-            UPDATE `train` SET `capacity` = @capa + 1;
-            DELETE FROM `order` WHERE `oid` = %s;
-        """, (oid, username, oid ))
+        cursor.execute("BEGIN;")
+        cursor.execute("SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);", (oid, ))
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
+        cursor.execute("SET @train_name = (SELECT `train` FROM `order` WHERE `oid` = %s);", (oid, ))
+        cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = @train_name);")
+        cursor.execute("UPDATE `user` SET `balance` = @remain + @price WHERE `username` = %s;", (username, ))
+        cursor.execute("UPDATE `train` SET `capacity` = @capa + 1 WHERE `train_name` = @train_name;")
+        cursor.execute("DELETE FROM `order` WHERE `oid` = %s;", (oid, ))
+        cursor.execute("COMMIT;")
+        Conn.commit()
         return True
     except Exception as e:
         print("[-] Delete order failed.\n" + str(e))
@@ -221,7 +222,7 @@ def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
         cursor.execute("BEGIN;")
         cursor.execute("SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);", (oid, ))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
-        cursor.execute("UPDATE `user` SET `price` = @remain - @price;")
+        cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (username, ))
         cursor.execute("UPDATE `order` SET `status` = 1 WHERE `oid` = %s;", (oid, ))
         cursor.execute("COMMIT;")
         Conn.commit()
@@ -269,7 +270,7 @@ def queryOrder(Conn: mysql.connector.MySQLConnection, username: str):
                 tmpList.append(order[3])
             tmpList.append(order[4])
             tmpList.append(order[6])
-            if order[5] == "0":
+            if not order[5]:
                 tmpList.append("未付款")
             else:
                 tmpList.append("已付款")
