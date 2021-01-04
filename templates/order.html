@@ -55,6 +55,43 @@
     </div>
 </nav>
 <main class="container">
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="toast-container position-absolute top-10 end-0 p-3">
+            <div id="unmodifiedToast" class="toast d-flex align-items-center text-white bg-primary border-0">
+                <div class="toast-body">
+                    没有信息被修改。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
+            <div id="valueEmptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
+                <div class="toast-body">
+                    数据不能为空。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
+            <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0">
+                <div class="toast-body">
+                    修改出错，请重试。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">选择用户</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3" id="usernameList"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTrain()">应用</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div>
         <form class="row g-3 w-75 align-items-center row-cols-lg-auto justify-content-center" style="margin: auto;">
             <span>
@@ -115,7 +152,37 @@
                 let table = document.getElementById("queryRes");
                 table.innerHTML = data;
             }
-        });
+        }).then(function () {
+            modifyListButton();
+        })
+    }
+
+    function modifyListButton() {
+        let buttonList = [].slice.call(document.querySelectorAll(".listButton"))
+        for (let i = 0; i < buttonList.length; i++) {
+            buttonList[i].setAttribute("data-bs-toggle", "modal");
+            buttonList[i].setAttribute("data-bs-target", "#orderModal");
+        }
+    }
+
+    function listButtonClicked(ele) {
+            window.fetch("/query_user", {
+                method: "GET",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            }).then(function (res) {
+                if(!res.ok) {
+                    return "";
+                }
+                else {
+                    return(res.text());
+                }
+            }).then(function (data) {
+                form = document.getElementById("usernameList");
+                form.innerHTML = data;
+            });
     }
 
     runQuery();

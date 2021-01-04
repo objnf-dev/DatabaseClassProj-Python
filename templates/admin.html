@@ -78,6 +78,12 @@
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
+            <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0">
+                <div class="toast-body">
+                    修改出错，请重试。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
         </div>
         <div class="modal-dialog">
             <div class="modal-content">
@@ -122,8 +128,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="submitTrain(this)">确定</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTrain()">应用</button>
                 </div>
             </div>
         </div>
@@ -139,7 +145,7 @@
             <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
             <div class="col-md-1"></div>
             <button type="button" class="btn btn-primary col-md-2" data-bs-toggle="modal"
-                    data-bs-target="#trainValue">添加列车
+                    data-bs-target="#trainValue" onclick="emptyForm()">添加列车
             </button>
         </form>
     </div>
@@ -166,6 +172,9 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+    let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
+            "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
+
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
 
@@ -207,8 +216,6 @@
 
     function listButtonClicked(ele) {
         let infoList = ele.parentNode.parentNode.children;
-        let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
-            "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
         for (let i = 0; i < 7; i++) {
             let tmpEle = document.getElementById(checkList[i]);
             let originVal = infoList[i].innerText;
@@ -220,9 +227,14 @@
         }
     }
 
-    function submitTrain(ele) {
-        let checkList = ["train_name_modified", "start_station_modified", "start_time_modified",
-            "stop_station_modified", "stop_time_modified", "price_modified", "capacity_modified"];
+    function emptyForm() {
+        for(let i=0; i<7; i++) {
+            let tmpEle = document.getElementById(checkList[i]);
+            tmpEle.value = "";
+        }
+    }
+
+    function submitTrain() {
         let formData = new URLSearchParams();
         let unmodified = 0;
         for (let i = 0; i < 7; i++) {
@@ -250,6 +262,15 @@
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: formData
+        }).then(function (res) {
+            if(!res.ok) {
+                let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                toast.show();
+            }
+            else {
+                let modal = bootstrap.Modal.getInstance(document.getElementById("trainValue"));
+                modal.hide();
+            }
         })
     }
 

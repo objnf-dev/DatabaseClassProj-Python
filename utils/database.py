@@ -92,9 +92,11 @@ def queryAllUser(Conn: mysql.connector.MySQLConnection):
             SELECT `username` FROM `user` WHERE `is_admin` = 0;
         """)
         Conn.commit()
-        res = ()
+        res = {}
+        num = 0
         for user in cursor:
-            res += (user, )
+            num = num + 1
+            res[str(num)] = user[0]
         return True, res
     except Exception as e:
         print("[-] User query failed.\n" + str(e))
