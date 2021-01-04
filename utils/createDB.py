@@ -69,6 +69,7 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `train` CHAR(10) NOT NULL,
                 FOREIGN KEY (`train`) REFERENCES train(`train_name`),
                 `gid` INT,
+                `price` FLOAT NOT NULL,
                 `status` TINYINT(1) NOT NULL
             );
         """)

@@ -86,7 +86,7 @@ def checkUserUnique(Conn: mysql.connector.MySQLConnection, username: str):
 
 
 def queryAllUser(Conn: mysql.connector.MySQLConnection):
-    cursor = Conn.cursor()
+    cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
             SELECT `username` FROM `user` WHERE `is_admin` = 0;
@@ -150,8 +150,19 @@ def placeGroupOrder(Conn: mysql.connector.MySQLConnection, usernameList: list, t
     pass
 
 
-def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int):
-    pass
+def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        cursor.execute("""
+            SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);
+            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
+            UPDATE `user` SET `price` = @remain + @price;
+            DELETE FROM `order` WHERE `oid` = %s;
+        """, (oid, username, oid ))
+        return True
+    except Exception as e:
+        print("[-] Delete order failed.\n" + str(e))
+        return False
 
 
 def removeGroupOrder(Conn: mysql.connector.MySQLConnection):
