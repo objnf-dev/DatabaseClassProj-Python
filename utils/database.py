@@ -2,6 +2,7 @@ import mysql.connector
 import sys
 from datetime import datetime
 from hashlib import md5
+import time
 from . import errno
 
 DBConn = None
@@ -20,8 +21,8 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
     cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
-            INSERT INTO user(`username`, `password`, `gid`, `is_admin`, `is_group_admin`, `balance`) VALUES
-            (%s, MD5(%s), NULL, 0, 0, 100.0);
+            INSERT INTO user(`username`, `password`, `is_admin`, `balance`) VALUES
+            (%s, MD5(%s), 0, 100.0);
         """, (username, password))
         Conn.commit()
         cursor.close()
@@ -147,13 +148,14 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
 def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str, status: int):
     cursor = Conn.cursor(buffered=True)
     try:
+        currentTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         cursor.execute("BEGIN;")
         cursor.execute("SET @price = (SELECT `price` FROM `train` WHERE `train_name` = %s);", (train, ))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
         if status == "1":
             cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (username, ))
-        cursor.execute("""INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`) VALUES
-                    (%s, %s, NULL, @price, %s);""", (username, train, status))
+        cursor.execute("""INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`, `timestamp`) VALUES
+                    (%s, %s, NULL, @price, %s, %s);""", (username, train, status, currentTime))
         cursor.execute("COMMIT;")
         Conn.commit()
         return True
@@ -162,8 +164,30 @@ def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str,
         return False
 
 
-def placeGroupOrder(Conn: mysql.connector.MySQLConnection, usernameList: list, train: str, gid: int, status: int):
-    pass
+def placeGroupOrder(Conn: mysql.connector.MySQLConnection, currentUser:str, usernameList: list, train: \
+                    str, status: int):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        currentTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        cursor.execute("BEGIN;")
+        cursor.execute("INSERT INTO `group`(`admin`, `timestamp`) VALUES (%s, %s);", (currentUser, currentTime))
+        cursor.execute("SET @gid = (SELECT `id` FROM `group` WHERE `timestamp` = %s);", (currentTime, ))
+        userNum = len(usernameList)
+        cursor.execute("SET @price = %s * (SELECT `price` FROM `train` WHERE `train_name` = %s);", (userNum, train))
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (currentUser,))
+        if status == "1":
+            cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (currentUser,))
+        for user in usernameList:
+            cursor.execute("""
+                INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`, `timestamp`) VALUES
+                (%s, %s, @gid, @price, %s, %s);
+            """, (user, train, status, currentTime))
+        cursor.execute("COMMIT;")
+        Conn.commit()
+        return True
+    except Exception as e:
+        print("[-] Place group order failed.\n" + str(e))
+        return False
 
 
 def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):

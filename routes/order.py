@@ -32,8 +32,12 @@ def groupOrder():
         abort(401)
     if "username" in request.form and request.form["username"] and "train_name" in request.form and \
             request.form["train_name"] and "status" in request.form and request.form["status"]:
-        pass
-    return request.form
+        nameList = request.form["username"].split(",")
+        status = utils.database.placeGroupOrder(utils.database.DBConn, session["user"], nameList, \
+                                                request.form["train_name"], request.form["status"])
+        if status:
+            return "ok"
+    abort(500)
 
 
 @routes.route("/refund")

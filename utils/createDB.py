@@ -45,7 +45,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
             CREATE TABLE `group`(
                 `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `admin` CHAR(20) NOT NULL,
-                FOREIGN KEY (`admin`) REFERENCES `user`(`username`)
+                FOREIGN KEY (`admin`) REFERENCES `user`(`username`),
+                `timestamp` DATETIME CHECK ( `timestamp` >= SYSDATE() )
             );
         """)
         cursor.execute("""
@@ -77,7 +78,8 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `gid` INT,
                 FOREIGN KEY (`gid`) REFERENCES `group`(`id`),
                 `price` FLOAT NOT NULL CHECK ( price >= 0.0 ),
-                `status` TINYINT(1) NOT NULL
+                `status` TINYINT(1) NOT NULL,
+                `timestamp` DATETIME CHECK ( `timestamp` >= SYSDATE() )
             );
         """)
         Conn.commit()

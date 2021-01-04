@@ -57,12 +57,6 @@
 <main class="container">
     <div class="modal fade" id="orderModal" tabindex="-1">
         <div class="toast-container position-absolute top-10 end-0 p-3">
-            <div id="unmodifiedToast" class="toast d-flex align-items-center text-white bg-primary border-0">
-                <div class="toast-body">
-                    没有信息被修改。
-                </div>
-                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
-            </div>
             <div id="valueEmptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
                 <div class="toast-body">
                     请选择用户。
@@ -241,6 +235,15 @@
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: formData
+            }).then(function (res) {
+                if(!res.ok) {
+                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                    toast.show();
+                }
+                else {
+                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
+                    modal.hide();
+                }
             })
         }
     }
