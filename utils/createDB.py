@@ -37,10 +37,15 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
             CREATE TABLE `user`(
                 `username` CHAR(20) NOT NULL PRIMARY KEY,
                 `password` CHAR(32) NOT NULL,
-                `gid` INT,
                 `is_admin` TINYINT(1) NOT NULL,
-                `is_group_admin` TINYINT(1) NOT NULL,
                 `balance` FLOAT NOT NULL CHECK ( balance >= 0.0 )
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE `group`(
+                `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                `admin` CHAR(20) NOT NULL,
+                FOREIGN KEY (`admin`) REFERENCES `user`(`username`)
             );
         """)
         cursor.execute("""
@@ -70,23 +75,16 @@ def createTable(Conn: mysql.connector.MySQLConnection, admin: dict):
                 `train` CHAR(10) NOT NULL,
                 FOREIGN KEY (`train`) REFERENCES train(`train_name`),
                 `gid` INT,
+                FOREIGN KEY (`gid`) REFERENCES `group`(`id`),
                 `price` FLOAT NOT NULL CHECK ( price >= 0.0 ),
                 `status` TINYINT(1) NOT NULL
             );
         """)
-        cursor.execute("""
-            CREATE TRIGGER `check_order` BEFORE INSERT ON `order` FOR EACH ROW
-            BEGIN 
-                IF NEW.gid IS NOT NULL and NEW.gid NOT IN (SELECT DISTINCT `gid` from `user`) THEN
-                    SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = 'Order group info error.';
-                END IF;
-            END;
-        """)
         Conn.commit()
         for i in admin:
             cursor.execute("""
-                INSERT INTO user(`username`, `password`, `gid`, `is_admin`, `is_group_admin`, `balance`) VALUES
-                (%s, MD5(%s), NULL, 1, 0, 1000.0);
+                INSERT INTO user(`username`, `password`, `is_admin`, `balance`) VALUES
+                (%s, MD5(%s), 1, 1000.0);
             """, (i, admin[i]))
         Conn.commit()
     except Exception as e:
