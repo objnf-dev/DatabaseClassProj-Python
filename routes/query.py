@@ -41,6 +41,11 @@ def queryUser():
     return render_template("userlist.html", data=res)
 
 
-@routes.route("/api/query_order", methods=["POST"])
+@routes.route("/api/query_order", methods=["GET"])
 def queryOrder():
-    pass
+    if "user" not in session or "is_admin" not in session:
+        abort(401)
+    status, res = utils.database.queryOrder(utils.database.DBConn, session["user"])
+    if not status:
+        abort(500)
+    return render_template("list_button.html", info=res)

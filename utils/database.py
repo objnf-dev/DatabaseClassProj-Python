@@ -177,7 +177,7 @@ def placeGroupOrder(Conn: mysql.connector.MySQLConnection, currentUser:str, user
         cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = %s);", (train,))
         userNum = len(usernameList)
         cursor.execute("SET @price = %s * (SELECT `price` FROM `train` WHERE `train_name` = %s);", (userNum, train))
-        cursor.execute("UPDATE `train` SET `capacity` = @capa + %s WHERE `train_name` = %s;", (userNum, train))
+        cursor.execute("UPDATE `train` SET `capacity` = @capa - %s WHERE `train_name` = %s;", (userNum, train))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (currentUser,))
         if status == "1":
             cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (currentUser,))
@@ -250,3 +250,32 @@ def updateTrain(Conn: mysql.connector.MySQLConnection, trainInfo: list, train_na
     except Exception as e:
         print("[-] Update train error.\n" + str(e))
         return False
+
+
+def queryOrder(Conn: mysql.connector.MySQLConnection, username: str):
+    cursor = Conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM `order` WHERE `username` = %s;", (username,))
+        res = {}
+        num = 0
+        for order in cursor:
+            tmpList = [order[0], order[2]]
+            if not order[3]:
+                tmpList.append("否")
+                tmpList.append("")
+            else:
+                tmpList.append("是")
+                tmpList.append(order[3])
+            tmpList.append(order[4])
+            if order[5] == "0":
+                tmpList.append("未付款")
+            else:
+                tmpList.append("已付款")
+            tmpList.append(order[6])
+
+            res[str(num)] = tmpList
+            num = num + 1
+        return True, res
+    except Exception as e:
+        print("[-] Query order failed.\n" + str(e))
+        return False, None
