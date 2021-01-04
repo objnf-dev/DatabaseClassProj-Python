@@ -20,8 +20,8 @@ def createUser(Conn: mysql.connector.MySQLConnection, username: str, password: s
     cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("""
-            INSERT INTO user(`username`, `password`, `gid`, `is_admin`) VALUES
-            (%s, MD5(%s), NULL, 0);
+            INSERT INTO user(`username`, `password`, `gid`, `is_admin`, `is_group_admin`, `balance`) VALUES
+            (%s, MD5(%s), NULL, 0, 0, 100.0);
         """, (username, password))
         Conn.commit()
         cursor.close()
