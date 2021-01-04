@@ -75,6 +75,8 @@
                 <input type="text" id="train_name" class="form-control" placeholder="G1234">
             </div>
             <button type="button" onclick="runQuery()" class="btn btn-primary col-md-1">搜索</button>
+            <div class="col-md-1"></div>
+            <button type="button" onclick="" class="btn btn-primary col-md-2">添加列车</button>
         </form>
     </div>
     <br/><br/>
@@ -103,39 +105,34 @@
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
 
-        if (!train_name) {
-            let toast = new bootstrap.Toast(document.getElementById("emptyToast"));
-            toast.show();
-        } else {
-            let formData = new URLSearchParams();
-            formData.append("train_name", train_name);
-            formData.append("start_station", start_station);
-            formData.append("stop_station", stop_station);
-            formData.append("start_time", start_time);
-            formData.append("stop_time", stop_time);
+        let formData = new URLSearchParams();
+        formData.append("train_name", train_name);
+        formData.append("start_station", start_station);
+        formData.append("stop_station", stop_station);
+        formData.append("start_time", start_time);
+        formData.append("stop_time", stop_time);
 
-            window.fetch("/query", {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData
-            }).then(function (res) {
-                if (!res.ok) {
-                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
-                    toast.show();
-                    return ""
-                } else {
-                    return res.text()
-                }
-            }).then(function (data) {
-                if (data) {
-                    let table = document.getElementById("queryRes");
-                    table.innerHTML = data;
-                }
-            });
-        }
+        window.fetch("/query", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        }).then(function (res) {
+            if (!res.ok) {
+                let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                toast.show();
+                return ""
+            } else {
+                return res.text()
+            }
+        }).then(function (data) {
+            if (data) {
+                let table = document.getElementById("queryRes");
+                table.innerHTML = data;
+            }
+        });
     }
 
 </script>
