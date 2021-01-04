@@ -85,8 +85,20 @@ def checkUserUnique(Conn: mysql.connector.MySQLConnection, username: str):
         return False
 
 
-def queryUser():
-    pass
+def queryAllUser(Conn: mysql.connector.MySQLConnection):
+    cursor = Conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT `username` FROM `user` WHERE `is_admin` = 0;
+        """)
+        Conn.commit()
+        res = ()
+        for user in cursor:
+            res += (user, )
+        return True, res
+    except Exception as e:
+        print("[-] User query failed.\n" + str(e))
+        return False, None
 
 
 def queryTrain(Conn: mysql.connector.MySQLConnection, info):
@@ -129,3 +141,22 @@ def queryTrain(Conn: mysql.connector.MySQLConnection, info):
         print("[-] Check train info error.\n" + str(e))
         return False, None
 
+
+def placeOrder(Conn: mysql.connector.MySQLConnection, username: str, train: str, status: int):
+    pass
+
+
+def placeGroupOrder(Conn: mysql.connector.MySQLConnection, usernameList: list, train: str, gid: int, status: int):
+    pass
+
+
+def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int):
+    pass
+
+
+def removeGroupOrder(Conn: mysql.connector.MySQLConnection):
+    pass
+
+
+def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
+    pass

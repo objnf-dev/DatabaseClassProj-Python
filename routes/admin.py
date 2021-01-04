@@ -12,6 +12,11 @@ def admin():
     return render_template("admin.html")
 
 
-@routes.route("/change")
+@routes.route("/change", methods=["POST"])
 def change():
-    pass
+    if "user" not in session or "is_admin" not in session:
+        abort(401)
+    elif not session["is_admin"]:
+        abort(401)
+    info = {}
+    return render_template("list_admin.html", info=info)
