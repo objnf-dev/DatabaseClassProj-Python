@@ -218,12 +218,13 @@ def removeGroupOrder(Conn: mysql.connector.MySQLConnection):
 def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
     cursor = Conn.cursor(buffered=True)
     try:
-        cursor.execute("""
-            SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);
-            SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);
-            UPDATE `user` SET `price` = @remain - @price;
-            UPDATE `order` SET `status` = 1 WHERE `oid` = %s;
-        """, (oid, username, oid))
+        cursor.execute("BEGIN;")
+        cursor.execute("SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);", (oid, ))
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
+        cursor.execute("UPDATE `user` SET `price` = @remain - @price;")
+        cursor.execute("UPDATE `order` SET `status` = 1 WHERE `oid` = %s;", (oid, ))
+        cursor.execute("COMMIT;")
+        Conn.commit()
         return True
     except Exception as e:
         print("[-] Pay for order failed.\n" + str(e))
@@ -267,11 +268,11 @@ def queryOrder(Conn: mysql.connector.MySQLConnection, username: str):
                 tmpList.append("是")
                 tmpList.append(order[3])
             tmpList.append(order[4])
+            tmpList.append(order[6])
             if order[5] == "0":
                 tmpList.append("未付款")
             else:
                 tmpList.append("已付款")
-            tmpList.append(order[6])
 
             res[str(num)] = tmpList
             num = num + 1

@@ -59,13 +59,13 @@
         <div class="toast-container position-absolute top-10 end-0 p-3">
             <div id="valueEmptyToast" class="toast d-flex align-items-center text-white bg-danger border-0">
                 <div class="toast-body">
-                    请选择用户。
+                    请选择一个选项。
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
             <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0">
                 <div class="toast-body">
-                    下单出错，请重试。
+                    操作出错，请重试。
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
@@ -73,16 +73,22 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">选择用户</h5>
+                    <h5 class="modal-title">编辑订单</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="row g-3" id="usernameList"></form>
+                    <form class="row g-3 w-75" style="margin: auto;">
+                        <select class="form-select" id="selectForm">
+                            <option selected value="">请选择</option>
+                            <option value="1">删除订单并退款</option>
+                            <option value="2" id="selectGroupDel" style="display: none;">删除团体订单并退款</option>
+                            <option value="3" id="selectPay" style="display: none;">支付订单</option>
+                        </select>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" onclick="submitOrder(0)">预订</button>
-                    <button type="button" class="btn btn-primary" onclick="submitOrder(1)">下单</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitOrder()">确定</button>
                 </div>
             </div>
         </div>
@@ -142,38 +148,19 @@
     }
 
     function listButtonClicked(ele) {
-        trainName = ele.parentNode.parentNode.children[0].innerText;
-
-        window.fetch("/api/query_user", {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-        }).then(function (res) {
-            if (!res.ok) {
-                return "";
-            } else {
-                return (res.text());
-            }
-        }).then(function (data) {
-            form = document.getElementById("usernameList");
-            form.innerHTML = data;
-        });
+        childList = ele.parentNode.parentNode.children;
+        if(childList[2].innerText === "是") {
+            document.getElementById("selectGroupDel").style.display = "";
+        }
+        if(childList[5].innerText === "未付款") {
+            document.getElementById("selectPay").style.display = "";
+        }
     }
 
     function submitOrder(status) {
-        let checkboxList = [].slice.call(document.querySelectorAll(".form-check-input"));
-        let groupOrder = -1;
-        let userList = [];
-        for (let i = 0; i < checkboxList.length; i++) {
-            if (checkboxList[i].checked) {
-                groupOrder += 1;
-                userList.push(checkboxList[i].value);
-            }
-        }
+        let option = document.getElementById("selectForm").value;
 
-        if (groupOrder === -1) {
+        if (option === "") {
             let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
             toast.show();
         } else if (groupOrder === 0) {
