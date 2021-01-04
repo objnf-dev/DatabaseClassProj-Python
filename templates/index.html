@@ -125,9 +125,6 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
-    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
-
-
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
         let start_station = document.getElementById("start_station").value;
@@ -168,8 +165,9 @@
                     let table = document.getElementById("queryRes");
                     table.innerHTML = data;
                 }
-            })
+            });
         }
     }
+
 </script>
 </html>
