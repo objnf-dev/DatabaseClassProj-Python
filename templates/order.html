@@ -126,6 +126,8 @@
 <script src="/static/bootstrap.bundle.min.js"></script>
 </body>
 <script>
+    let trainNum = "";
+
     function runQuery() {
         let train_name = document.getElementById("train_name").value;
 
@@ -166,42 +168,42 @@
     }
 
     function listButtonClicked(ele) {
-            window.fetch("/api/query_user", {
-                method: "GET",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            }).then(function (res) {
-                if(!res.ok) {
-                    return "";
-                }
-                else {
-                    return(res.text());
-                }
-            }).then(function (data) {
-                form = document.getElementById("usernameList");
-                form.innerHTML = data;
-            });
+        trainNum = ele.parentNode.parentNode.children[0].innerText;
+
+        window.fetch("/api/query_user", {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        }).then(function (res) {
+            if (!res.ok) {
+                return "";
+            } else {
+                return (res.text());
+            }
+        }).then(function (data) {
+            form = document.getElementById("usernameList");
+            form.innerHTML = data;
+        });
     }
 
     function submitOrder() {
         let checkboxList = [].slice.call(document.querySelectorAll(".form-check-input"));
         let groupOrder = -1;
         let userList = [];
-        for(let i=0; i<checkboxList.length; i++) {
-            if(checkboxList[i].checked) {
+        for (let i = 0; i < checkboxList.length; i++) {
+            if (checkboxList[i].checked) {
                 groupOrder += 1;
                 userList.push(checkboxList[i].value);
             }
         }
 
-        if(groupOrder === -1) {
+        if (groupOrder === -1) {
             let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
             toast.show();
-        }
-        else if(groupOrder === 0) {
-            
+        } else if (groupOrder === 0) {
+
             window.fetch("/api/order", {
                 method: "POST",
                 credentials: "same-origin",
@@ -211,8 +213,7 @@
                 },
                 body: formData
             })
-        }
-        else {
+        } else {
 
         }
     }

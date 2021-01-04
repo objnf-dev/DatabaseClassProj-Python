@@ -23,7 +23,7 @@ def queryList():
     if "user" not in session or "is_admin" not in session:
         abort(401)
     info = {}
-    if request.form["train_name"]:
+    if "train_name" in request.form and request.form["train_name"]:
         info["train_name"] = request.form["train_name"]
     status, res = utils.database.queryTrain(utils.database.DBConn, info)
     if not status:
