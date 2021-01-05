@@ -157,98 +157,65 @@
     function listButtonClicked(ele) {
         let childList = ele.parentNode.parentNode.children;
         orderID = childList[0].innerText;
-        if(childList[2].innerText === "否") {
+        if (childList[2].innerText === "否") {
             document.getElementById("selectDel").style.display = "";
         }
-        if(childList[2].innerText === "是") {
+        if (childList[2].innerText === "是") {
             document.getElementById("selectGroupDel").style.display = "";
         }
-        if(childList[2].innerText === "否" && childList[5].innerText === "未付款") {
+        if (childList[2].innerText === "否" && childList[5].innerText === "未付款") {
             document.getElementById("selectPay").style.display = "";
         }
-        if(childList[2].innerText === "是" && childList[5].innerText === "未付款") {
+        if (childList[2].innerText === "是" && childList[5].innerText === "未付款") {
             document.getElementById("selectGroupPay").style.display = "";
         }
     }
 
     function submitOpt() {
         let option = document.getElementById("selectForm").value;
+        let url = ""
+        let toastName = ""
 
         if (option === "") {
             let toast = new bootstrap.Toast(document.getElementById("valueEmptyToast"));
             toast.show();
         } else if (option === "1") {
-            let formData = new URLSearchParams();
-            formData.append("oid", orderID);
+            url = "/api/refund";
+            toastName = "errorToast";
 
-            window.fetch("/api/refund", {
-                method: "POST",
-                credentials: "same-origin",
-                redirect: "follow",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData
-            }).then(function (res) {
-                if(!res.ok) {
-                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
-                    toast.show();
-                }
-                else {
-                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
-                    modal.hide();
-                    setTimeout(function () {location.reload();}, 500);
-                }
-            });
         } else if (option === "2") {
-
+            url = "/api/group_refund";
+            toastName = "notAdminToast";
         } else if (option === "3") {
-            let formData = new URLSearchParams();
-            formData.append("oid", orderID);
-
-            window.fetch("/api/pay", {
-                method: "POST",
-                credentials: "same-origin",
-                redirect: "follow",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData
-            }).then(function (res) {
-                if(!res.ok) {
-                    let toast = new bootstrap.Toast(document.getElementById("errorToast"));
-                    toast.show();
-                }
-                else {
-                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
-                    modal.hide();
-                    setTimeout(function () {location.reload();}, 500);
-                }
-            });
+            url = "/api/pay";
+            toastName = "errorToast";
         } else if (option === "4") {
-            let formData = new URLSearchParams();
-            formData.append("oid", orderID);
-
-            window.fetch("/api/group_pay", {
-                method: "POST",
-                credentials: "same-origin",
-                redirect: "follow",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData
-            }).then(function (res) {
-                if(!res.ok) {
-                    let toast = new bootstrap.Toast(document.getElementById("notAdminToast"));
-                    toast.show();
-                }
-                else {
-                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
-                    modal.hide();
-                    setTimeout(function () {location.reload();}, 500);
-                }
-            });
+            url = "/api/group_pay";
+            toastName = "notAdminToast";
         }
+
+        let formData = new URLSearchParams();
+        formData.append("oid", orderID);
+        window.fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            redirect: "follow",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        }).then(function (res) {
+            if (!res.ok) {
+                let toast = new bootstrap.Toast(document.getElementById(toastName));
+                toast.show();
+            } else {
+                let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
+                modal.hide();
+                setTimeout(function () {
+                    location.reload();
+                }, 500);
+            }
+        });
     }
 
     runQuery();

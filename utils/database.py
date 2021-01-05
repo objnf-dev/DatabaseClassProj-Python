@@ -175,11 +175,11 @@ def placeGroupOrder(Conn: mysql.connector.MySQLConnection, currentUser:str, user
         cursor.execute("SET @gid = (SELECT `id` FROM `group` WHERE `timestamp` = %s);", (currentTime, ))
         cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = %s);", (train,))
         userNum = len(usernameList)
-        cursor.execute("SET @price = %s * (SELECT `price` FROM `train` WHERE `train_name` = %s);", (userNum, train))
+        cursor.execute("SET @price =(SELECT `price` FROM `train` WHERE `train_name` = %s);", (train, ))
         cursor.execute("UPDATE `train` SET `capacity` = @capa - %s WHERE `train_name` = %s;", (userNum, train))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (currentUser,))
         if status == "1":
-            cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = %s;", (currentUser,))
+            cursor.execute("UPDATE `user` SET `balance` = @remain - %s * @price WHERE `username` = %s;", (userNum, currentUser))
         for user in usernameList:
             cursor.execute("""
                 INSERT INTO `order`(`username`, `train`, `gid`, `price`, `status`, `timestamp`) VALUES
@@ -197,7 +197,7 @@ def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
     cursor = Conn.cursor(buffered=True)
     try:
         cursor.execute("BEGIN;")
-        cursor.execute("SET @price = (SELECT `price` FROM `order` WHERE `oid` = %s);", (oid, ))
+        cursor.execute("SET @price = IFNULL((SELECT `price` FROM `order` WHERE `oid` = %s AND `status` = 1), 0);", (oid, ))
         cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = %s);", (username, ))
         cursor.execute("SET @train_name = (SELECT `train` FROM `order` WHERE `oid` = %s);", (oid, ))
         cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = @train_name);")
@@ -215,8 +215,31 @@ def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
 def removeGroupOrder(Conn: mysql.connector.MySQLConnection, oid: str, username: str):
     cursor = Conn.cursor(buffered=True)
     try:
+        cursor.execute("""
+                    SELECT `admin` FROM `group` WHERE `id` = (SELECT `gid` FROM `order` WHERE `oid` = %s);
+                """, (oid,))
+        Conn.commit()
+        for data in cursor:
+            if username != data[0]:
+                return False
         cursor.execute("BEGIN;")
-        cursor.execute("SET ")
+        cursor.execute("SET @gid = (SELECT `gid` FROM `order` WHERE `oid` = %s);", (oid,))
+        cursor.execute("SET @train_name = (SELECT `train` FROM `order` WHERE `oid` = %s);", (oid,))
+        cursor.execute("SET @capa = (SELECT `capacity` FROM `train` WHERE `train_name` = @train_name);")
+        cursor.execute("SET @admin = (SELECT `admin` FROM `group` WHERE `id` = @gid);")
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = @admin);")
+        cursor.execute("SET @usernum = (SELECT COUNT(`oid`) FROM `order` WHERE `gid` = @gid);")
+        cursor.execute("SET @price = IFNULL((SELECT SUM(`price`) FROM `order` WHERE `gid` = @gid AND `status` = 1), 0);")
+        cursor.execute("UPDATE `user` SET `balance` = @remain + @price WHERE `username` = @admin")
+        cursor.execute("UPDATE `train` SET `capacity` = @capa + @usernum WHERE `train_name` = @train_name;")
+        cursor.execute("DELETE FROM `order` WHERE `gid` = @gid;")
+        cursor.execute("DELETE FROM `group` WHERE `id` = @gid;")
+        cursor.execute("COMMIT;")
+        Conn.commit()
+        return True
+    except Exception as e:
+        print("[-] Delete group order failed.\n" + str(e))
+        return False
 
 
 
