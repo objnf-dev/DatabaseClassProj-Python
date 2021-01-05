@@ -69,6 +69,12 @@
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
             </div>
+            <div id="notAdminToast" class="toast d-flex align-items-center text-white bg-danger border-0">
+                <div class="toast-body">
+                    发生错误。您可能不是团体创建者。
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast"></button>
+            </div>
         </div>
         <div class="modal-dialog">
             <div class="modal-content">
@@ -80,9 +86,10 @@
                     <form class="row g-3 w-75" style="margin: auto;">
                         <select class="form-select" id="selectForm">
                             <option selected value="">请选择</option>
-                            <option value="1">删除订单并退款</option>
+                            <option value="1" id="selectDel" style="display: none;">删除订单并退款</option>
                             <option value="2" id="selectGroupDel" style="display: none;">删除团体订单并退款</option>
                             <option value="3" id="selectPay" style="display: none;">支付订单</option>
+                            <option value="4" id="selectGroupPay" style="display: none">支付团体订单</option>
                         </select>
                     </form>
                 </div>
@@ -150,11 +157,17 @@
     function listButtonClicked(ele) {
         let childList = ele.parentNode.parentNode.children;
         orderID = childList[0].innerText;
+        if(childList[2].innerText === "否") {
+            document.getElementById("selectDel").style.display = "";
+        }
         if(childList[2].innerText === "是") {
             document.getElementById("selectGroupDel").style.display = "";
         }
-        if(childList[5].innerText === "未付款") {
+        if(childList[2].innerText === "否" && childList[5].innerText === "未付款") {
             document.getElementById("selectPay").style.display = "";
+        }
+        if(childList[2].innerText === "是" && childList[5].innerText === "未付款") {
+            document.getElementById("selectGroupPay").style.display = "";
         }
     }
 
@@ -204,6 +217,29 @@
             }).then(function (res) {
                 if(!res.ok) {
                     let toast = new bootstrap.Toast(document.getElementById("errorToast"));
+                    toast.show();
+                }
+                else {
+                    let modal = bootstrap.Modal.getInstance(document.getElementById("orderModal"));
+                    modal.hide();
+                    setTimeout(function () {location.reload();}, 500);
+                }
+            });
+        } else if (option === "4") {
+            let formData = new URLSearchParams();
+            formData.append("oid", orderID);
+
+            window.fetch("/api/group_pay", {
+                method: "POST",
+                credentials: "same-origin",
+                redirect: "follow",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            }).then(function (res) {
+                if(!res.ok) {
+                    let toast = new bootstrap.Toast(document.getElementById("notAdminToast"));
                     toast.show();
                 }
                 else {

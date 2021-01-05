@@ -212,8 +212,12 @@ def removeOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
         return False
 
 
-def removeGroupOrder(Conn: mysql.connector.MySQLConnection):
-    pass
+def removeGroupOrder(Conn: mysql.connector.MySQLConnection, oid: str, username: str):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        cursor.execute("BEGIN;")
+        cursor.execute("SET ")
+
 
 
 def payOrder(Conn: mysql.connector.MySQLConnection, oid: int, username: str):
@@ -281,3 +285,28 @@ def queryOrder(Conn: mysql.connector.MySQLConnection, username: str):
     except Exception as e:
         print("[-] Query order failed.\n" + str(e))
         return False, None
+
+
+def groupPay(Conn: mysql.connector.MySQLConnection, oid: str, username: str):
+    cursor = Conn.cursor(buffered=True)
+    try:
+        cursor.execute("""
+            SELECT `admin` FROM `group` WHERE `id` = (SELECT `gid` FROM `order` WHERE `oid` = %s);
+        """, (oid, ))
+        Conn.commit()
+        for data in cursor:
+            if username != data[0]:
+                return False
+        cursor.execute("BEGIN;")
+        cursor.execute("SET @gid = (SELECT `gid` FROM `order` WHERE `oid` = %s);", (oid, ))
+        cursor.execute("SET @admin = (SELECT `admin` FROM `group` WHERE `id` = @gid);")
+        cursor.execute("SET @remain = (SELECT `balance` FROM `user` WHERE `username` = @admin);")
+        cursor.execute("SET @price = (SELECT SUM(`price`) FROM `order` WHERE `gid` = @gid);")
+        cursor.execute("UPDATE `user` SET `balance` = @remain - @price WHERE `username` = @admin;")
+        cursor.execute("UPDATE `order` SET `status` = 1 WHERE `gid` = @gid;")
+        cursor.execute("COMMIT;")
+        Conn.commit()
+        return True
+    except Exception as e:
+        print("[-] Pay for group order failed.\n" + str(e))
+        return False

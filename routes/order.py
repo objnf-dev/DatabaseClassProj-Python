@@ -61,7 +61,14 @@ def rmOrder():
 
 @routes.route("/api/group_refund", methods=["POST"])
 def groupRmOrder():
-    pass
+    if "user" not in session or "is_admin" not in session:
+        abort(401)
+    if "oid" not in request.form or not request.form["oid"]:
+        abort(500)
+    status = utils.database.removeGroupOrder(utils.database.DBConn, request.form["oid"], session["user"])
+    if not status:
+        abort(500)
+    return "ok"
 
 
 @routes.route("/api/pay", methods=["POST"])
@@ -71,6 +78,18 @@ def payOrder():
     if "oid" not in request.form or not request.form["oid"]:
         abort(500)
     status = utils.database.payOrder(utils.database.DBConn, request.form["oid"], session["user"])
+    if not status:
+        abort(500)
+    return "ok"
+
+
+@routes.route("/api/group_pay", methods=["POST"])
+def payGroupOrder():
+    if "user" not in session or "is_admin" not in session:
+        abort(401)
+    if "oid" not in request.form or not request.form["oid"]:
+        abort(500)
+    status = utils.database.groupPay(utils.database.DBConn, request.form["oid"], session["user"])
     if not status:
         abort(500)
     return "ok"
